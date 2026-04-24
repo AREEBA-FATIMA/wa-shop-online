@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f0f0f;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --border: rgba(255,255,255,0.08);
+  --text: #ffffff;
+  --text2: #9ca3af;
+  --text3: #6b7280;
+  --wa: #25D366;
+  --wa-dark: #075e54;
+  --bubble-in: #1f2937;
+  --bubble-out: #005c4b;
+}
+
+[data-theme="light"] {
+  --bg: #f0f2f5;
+  --bg2: #ffffff;
+  --bg3: #f0f2f5;
+  --border: rgba(0,0,0,0.1);
+  --text: #111111;
+  --text2: #374151;
+  --text3: #6b7280;
+  --bubble-in: #ffffff;
+  --bubble-out: #d9fdd3;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: background 0.2s, color 0.2s;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+
+.wa-bubble-in {
+  background: var(--bubble-in);
+  border-radius: 12px 12px 12px 0;
+  color: var(--text);
+}
+.wa-bubble-out {
+  background: var(--bubble-out);
+  border-radius: 12px 12px 0 12px;
+  color: var(--text);
+}
+
+[data-theme="light"] .wa-bubble-out { color: #111; }
