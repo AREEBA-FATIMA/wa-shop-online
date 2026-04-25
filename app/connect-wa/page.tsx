@@ -5,11 +5,9 @@ import { MessageCircle, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 
 type Status = 'waiting' | 'qr' | 'authenticated' | 'ready' | 'error';
 
-// Vercel par NEXT_PUBLIC_WA_URL set karo (HF Space URL)
-// Local par empty = proxy
-const WA_URL = typeof window !== 'undefined'
-  ? (process.env.NEXT_PUBLIC_WA_URL || '')
-  : '';
+// HF Space URL — yahan hardcode hai taake Vercel build mein sahi embed ho
+const HF_SPACE = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
+const WA_URL = HF_SPACE;
 
 export default function ConnectWA() {
   const router = useRouter();

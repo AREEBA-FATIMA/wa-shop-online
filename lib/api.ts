@@ -1,16 +1,10 @@
 import axios from 'axios';
 
-function getBaseURL() {
-  if (typeof window !== 'undefined') {
-    // Vercel par: NEXT_PUBLIC_API_URL set hoga (HF Space URL)
-    // Local Docker par: empty = Next.js proxy use hoga
-    return process.env.NEXT_PUBLIC_API_URL || '';
-  }
-  // Server-side (SSR): internal Docker URL
-  return process.env.INTERNAL_API_URL || 'http://api:8000';
-}
+// NEXT_PUBLIC_ variables build time par embed hote hain
+// Vercel par NEXT_PUBLIC_API_URL set karo → https://areeba-fatima-wa-shop-online.hf.space
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
-const api = axios.create({ baseURL: getBaseURL() });
+const api = axios.create({ baseURL: API_BASE });
 
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
