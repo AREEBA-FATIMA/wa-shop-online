@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
-import { Send, Bot, User2, Search, RefreshCw, MessageCircle } from 'lucide-react';
+import { Send, Bot, User2, Search, RefreshCw, MessageCircle, Trash2 } from 'lucide-react';
 
 interface Chat { id: string; customer_phone: string; customer_name: string; last_message: string; last_message_at: string; unread_count: number; status: string; }
 interface Message { id: string; content: string; from_customer: boolean; created_at: string; ai_generated: boolean; }
@@ -39,6 +39,16 @@ export default function ChatsPage() {
       setChats(r.data);
     } catch {}
     setLoading(false);
+  }
+
+  async function deleteChat(chatId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!confirm('Yeh chat delete karna chahte hain?')) return;
+    try {
+      await api.delete(`/api/chats/${chatId}`);
+      setChats(prev => prev.filter(c => c.id !== chatId));
+      if (active?.id === chatId) { setActive(null); setMessages([]); }
+    } catch {}
   }
 
   async function loadMessages(chatId: string) {
@@ -156,11 +166,19 @@ export default function ChatsPage() {
                   </div>
                   <p className="text-gray-500 text-xs truncate">{chat.last_message}</p>
                 </div>
-                {chat.unread_count > 0 && (
-                  <div className="w-5 h-5 rounded-full bg-[#25D366] text-white text-xs flex items-center justify-center shrink-0">
-                    {chat.unread_count}
-                  </div>
-                )}
+                <div className="flex flex-col items-end gap-1 shrink-0">
+                  {chat.unread_count > 0 && (
+                    <div className="w-5 h-5 rounded-full bg-[#25D366] text-white text-xs flex items-center justify-center">
+                      {chat.unread_count}
+                    </div>
+                  )}
+                  <button
+                    onClick={(e) => deleteChat(chat.id, e)}
+                    className="p-1 text-gray-700 hover:text-red-400 transition-colors rounded"
+                    title="Delete chat">
+                    <Trash2 size={12} />
+                  </button>
+                </div>
               </button>
             ))
           )}

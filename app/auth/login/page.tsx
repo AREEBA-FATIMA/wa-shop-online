@@ -19,7 +19,12 @@ export default function Login() {
       const res = await api.post('/api/auth/login', { phone, password: pass });
       setToken(res.data.token);
       localStorage.setItem('wa_user', JSON.stringify(res.data.user));
-      router.push('/dashboard');
+      // WA connected hai to dashboard, warna connect page
+      if (res.data.user?.wa_connected) {
+        router.push('/dashboard');
+      } else {
+        router.push('/connect-wa');
+      }
     } catch (e: any) {
       setErr(e.response?.data?.detail || 'Login failed');
     } finally { setLoading(false); }
