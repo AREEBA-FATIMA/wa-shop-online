@@ -23,13 +23,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [waConnected, setWaConnected] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
+
   useEffect(() => {
     const u = localStorage.getItem('wa_user');
     if (!u) { router.push('/auth/login'); return; }
     const parsed = JSON.parse(u);
     setUser(parsed);
-    fetch(`http://localhost:8000/api/wa/status/${parsed.id}`)
-      .then(r => r.json()).then(d => setWaConnected(d.connected)).catch(() => {});
+
+    function checkWA() {
+      fetch(`${WA_URL}/wa/status/${parsed.id}`)
+        .then(r => r.json())
+        .then(d => setWaConnected(!!d.connected))
+        .catch(() => {});
+    }
+    checkWA();
+    const interval = setInterval(checkWA, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   function logout() { removeToken(); router.push('/'); }
