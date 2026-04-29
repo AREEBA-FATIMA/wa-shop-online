@@ -120,9 +120,37 @@ export default function ConnectWA() {
   useEffect(() => {
     const userId = getUserId();
     if (!userId) { router.push('/auth/login'); return; }
-    fetch(`${WA_URL}/wa/status/${userId}`)
-      .then(r => r.json()).then(d => { if (d.connected) router.push('/dashboard'); })
-      .catch(() => {});
+
+    async function checkAndReconnect() {
+      try {
+        // Pehle check karo — already connected hai?
+        const r = await fetch(`${WA_URL}/wa/status/${userId}`);
+        const d = await r.json();
+        if (d.connected) {
+          router.push('/dashboard');
+          return;
+        }
+        // Connected nahi — lekin session ho sakti hai
+        // Restart karo (session DELETE nahi hogi) — auto-reconnect hoga
+        setStatus('loading');
+        await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' });
+        // 15 seconds wait karo — WhatsApp session se reconnect ho jaye
+        await new Promise(res => setTimeout(res, 4000));
+        // Dobara check karo
+        const r2 = await fetch(`${WA_URL}/wa/status/${userId}`);
+        const d2 = await r2.json();
+        if (d2.connected) {
+          router.push('/dashboard');
+        } else {
+          // Session nahi thi — QR/Phone page dikhao
+          setStatus('idle');
+        }
+      } catch {
+        setStatus('idle');
+      }
+    }
+
+    checkAndReconnect();
     return () => esRef.current?.close();
   }, []);
 
