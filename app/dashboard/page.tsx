@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
-import { ShoppingBag, MessageCircle, Package, TrendingUp, AlertTriangle, ChevronRight } from 'lucide-react';
+import { ShoppingBag, MessageCircle, Package, TrendingUp, AlertTriangle, ArrowRight } from 'lucide-react';
 
 export default function DashboardHome() {
   const [stats, setStats] = useState<any>(null);
@@ -16,45 +16,64 @@ export default function DashboardHome() {
   }, []);
 
   const cards = stats ? [
-    { label: "Aaj ke Orders", value: stats.today_orders, icon: ShoppingBag, color: "text-[#25D366]", bg: "bg-[#25D366]/10" },
-    { label: "Aaj ki Kamai", value: `Rs.${stats.today_revenue?.toLocaleString() || 0}`, icon: TrendingUp, color: "text-blue-400", bg: "bg-blue-400/10" },
-    { label: "Total Chats", value: stats.total_chats, icon: MessageCircle, color: "text-purple-400", bg: "bg-purple-400/10" },
-    { label: "Total Products", value: stats.total_products, icon: Package, color: "text-amber-400", bg: "bg-amber-400/10" },
+    { label: "Aaj ke Orders", value: stats.today_orders, icon: ShoppingBag },
+    { label: "Aaj ki Kamai", value: `Rs.${stats.today_revenue?.toLocaleString() || 0}`, icon: TrendingUp },
+    { label: "Total Chats", value: stats.total_chats, icon: MessageCircle },
+    { label: "Total Products", value: stats.total_products, icon: Package },
   ] : [];
 
-  return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-xl font-bold mb-1">Dashboard</h1>
-      <p className="text-gray-500 text-sm mb-6">Aaj ki overview</p>
+  const quickLinks = [
+    { href: '/dashboard/chats', icon: MessageCircle, title: 'Chats', desc: 'Customer messages aur AI replies' },
+    { href: '/dashboard/products', icon: Package, title: 'Products', desc: 'Add, edit ya delete products' },
+    { href: '/dashboard/orders', icon: ShoppingBag, title: 'Orders', desc: 'Pending aur completed orders' },
+  ];
 
+  return (
+    <div className="p-5 max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="mb-6 mt-1">
+        <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Dashboard</h1>
+        <p className="text-sm mt-0.5" style={{ color: 'var(--text3)' }}>Aaj ki overview</p>
+      </div>
+
+      {/* Stats grid */}
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => <div key={i} className="bg-[#111] rounded-2xl h-24 animate-pulse border border-white/5" />)}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="card h-24 animate-pulse" style={{ background: 'var(--bg2)' }} />
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {cards.map((c,i) => (
-            <div key={i} className="bg-[#111] border border-white/8 rounded-2xl p-4">
-              <div className={`w-9 h-9 rounded-xl ${c.bg} flex items-center justify-center mb-3`}>
-                <c.icon size={18} className={c.color} />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+          {cards.map((c, i) => (
+            <div key={i} className="card p-4">
+              <div className="icon-box mb-3">
+                <c.icon size={16} strokeWidth={2} />
               </div>
-              <p className="text-2xl font-bold text-white">{c.value}</p>
-              <p className="text-gray-500 text-xs mt-1">{c.label}</p>
+              <p className="stat-num">{c.value}</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>{c.label}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Low stock alert */}
+      {/* Low stock */}
       {stats?.low_stock?.length > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-6">
+        <div className="mb-5 p-4 rounded-[14px]" style={{
+          background: 'rgba(234,160,30,0.08)',
+          border: '0.5px solid rgba(234,160,30,0.2)',
+        }}>
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle size={16} className="text-amber-400" />
-            <span className="text-amber-400 font-medium text-sm">Low Stock Alert</span>
+            <AlertTriangle size={14} style={{ color: '#e8a030' }} />
+            <span className="text-sm font-semibold" style={{ color: '#e8a030' }}>Low Stock Alert</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {stats.low_stock.map((p: any, i: number) => (
-              <span key={i} className="bg-amber-500/20 text-amber-300 text-xs px-3 py-1 rounded-full">
+              <span key={i} className="text-xs px-3 py-1 rounded-full" style={{
+                background: 'rgba(234,160,30,0.12)',
+                color: '#e8a030',
+                border: '0.5px solid rgba(234,160,30,0.25)',
+              }}>
                 {p.name} — {p.stock} baqi
               </span>
             ))}
@@ -63,19 +82,20 @@ export default function DashboardHome() {
       )}
 
       {/* Quick links */}
-      <div className="grid md:grid-cols-3 gap-4">
-        {[
-          { href: '/dashboard/chats', icon: MessageCircle, title: 'Chats Dekho', desc: 'Customer messages aur AI replies', color: 'text-[#25D366]' },
-          { href: '/dashboard/products', icon: Package, title: 'Products Manage', desc: 'Add, edit ya delete products', color: 'text-blue-400' },
-          { href: '/dashboard/orders', icon: ShoppingBag, title: 'Orders Track', desc: 'Pending aur completed orders', color: 'text-purple-400' },
-        ].map(c => (
-          <Link key={c.href} href={c.href} className="bg-[#111] border border-white/8 rounded-2xl p-5 hover:border-white/20 transition-all group">
-            <div className="flex items-center justify-between mb-3">
-              <c.icon size={20} className={c.color} />
-              <ChevronRight size={16} className="text-gray-600 group-hover:text-gray-400 transition-colors" />
+      <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text3)', letterSpacing: '0.08em' }}>QUICK ACCESS</p>
+      <div className="grid md:grid-cols-3 gap-3">
+        {quickLinks.map(c => (
+          <Link key={c.href} href={c.href}
+            className="card p-4 hover:scale-[1.01] active:scale-[0.99] transition-all group"
+            style={{ display: 'block' }}>
+            <div className="flex items-start justify-between mb-3">
+              <div className="icon-box">
+                <c.icon size={16} strokeWidth={2} />
+              </div>
+              <ArrowRight size={14} style={{ color: 'var(--text3)' }} className="group-hover:translate-x-0.5 transition-transform mt-1" />
             </div>
-            <p className="font-medium text-white mb-1">{c.title}</p>
-            <p className="text-gray-500 text-xs">{c.desc}</p>
+            <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{c.title}</p>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{c.desc}</p>
           </Link>
         ))}
       </div>

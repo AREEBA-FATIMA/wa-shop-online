@@ -30,7 +30,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!u) { router.push('/auth/login'); return; }
     const parsed = JSON.parse(u);
     setUser(parsed);
-
     function checkWA() {
       fetch(`${WA_URL}/wa/status/${parsed.id}`)
         .then(r => r.json())
@@ -47,68 +46,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/60 z-20 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed md:static inset-y-0 left-0 z-30 w-60 flex flex-col transition-transform duration-200 border-r
+      <aside className={`fixed md:static inset-y-0 left-0 z-30 w-56 flex flex-col transition-transform duration-200
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-        style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}>
+        style={{ background: 'var(--bg2)', borderRight: '0.5px solid var(--border)' }}>
 
-        <div className="h-16 flex items-center px-4 gap-2 border-b" style={{ borderColor: 'var(--border)' }}>
-          <div className="w-8 h-8 rounded-lg bg-[#25D366] flex items-center justify-center shrink-0">
-            <MessageCircle size={16} className="text-white" />
+        {/* Logo */}
+        <div className="h-16 flex items-center px-5 gap-2.5" style={{ borderBottom: '0.5px solid var(--border)' }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--green)' }}>
+            <MessageCircle size={14} className="text-white" />
           </div>
-          <span className="font-bold" style={{ color: 'var(--text)' }}>
-            WA-SHOP<span className="text-[#25D366]">.Online</span>
+          <span className="brand font-bold text-base" style={{ color: 'var(--text)' }}>
+            WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span>
           </span>
           <div className="ml-auto"><ThemeToggle /></div>
         </div>
 
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        {/* Nav */}
+        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+          <p className="text-xs font-600 px-3 mb-2 mt-1" style={{ color: 'var(--text3)', letterSpacing: '0.08em' }}>MENU</p>
           {NAV.map(n => {
             const active = path === n.href;
             return (
               <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-                  ${active ? 'bg-[#25D366]/15 text-[#25D366]' : 'hover:opacity-80'}`}
-                style={{ color: active ? '#25D366' : 'var(--text2)' }}>
-                <n.icon size={18} />
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm font-medium transition-all ${active ? 'nav-active' : 'hover:opacity-80'}`}
+                style={{ color: active ? 'var(--green)' : 'var(--text2)' }}>
+                <n.icon size={16} strokeWidth={active ? 2.5 : 1.8} />
                 {n.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t space-y-2" style={{ borderColor: 'var(--border)' }}>
+        {/* Footer */}
+        <div className="p-3 space-y-2" style={{ borderTop: '0.5px solid var(--border)' }}>
           <Link href="/connect-wa"
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs transition-all
-              ${waConnected ? 'bg-[#25D366]/10 text-[#25D366]' : 'bg-red-500/10 text-red-400 hover:bg-red-500/20'}`}>
-            {waConnected ? <Wifi size={14} /> : <WifiOff size={14} />}
-            {waConnected ? 'WhatsApp Connected' : 'Connect WhatsApp'}
+            className={`flex items-center gap-2 px-3 py-2 rounded-[10px] text-xs font-medium transition-all
+              ${waConnected ? '' : ''}`}
+            style={{
+              background: waConnected ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
+              color: waConnected ? 'var(--green)' : '#e05a5a',
+              border: `0.5px solid ${waConnected ? 'rgba(61,186,94,0.2)' : 'rgba(220,50,50,0.2)'}`,
+            }}>
+            {waConnected
+              ? <><span className="dot-live" /><Wifi size={13} />WhatsApp Connected</>
+              : <><WifiOff size={13} />Connect WhatsApp</>
+            }
           </Link>
-          <div className="flex items-center gap-2 px-3 py-2">
-            <div className="w-7 h-7 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] text-xs font-bold">
+          <div className="flex items-center gap-2.5 px-3 py-2">
+            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+              style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium truncate" style={{ color: 'var(--text)' }}>{user?.name || 'User'}</p>
+              <p className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>{user?.name || 'User'}</p>
               <p className="text-xs capitalize" style={{ color: 'var(--text3)' }}>{user?.plan || 'free'} plan</p>
             </div>
-            <button onClick={logout} className="text-red-400 hover:text-red-300 transition-colors">
-              <LogOut size={15} />
+            <button onClick={logout} className="transition-opacity hover:opacity-70" style={{ color: '#e05a5a' }}>
+              <LogOut size={14} />
             </button>
           </div>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="md:hidden h-14 flex items-center px-4 gap-3 border-b"
-          style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}>
+        {/* Mobile topbar */}
+        <div className="md:hidden h-14 flex items-center px-4 gap-3" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
           <button onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text2)' }}>
             <Menu size={20} />
           </button>
-          <span className="font-bold text-sm" style={{ color: 'var(--text)' }}>
-            WA-SHOP<span className="text-[#25D366]">.Online</span>
+          <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>
+            WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span>
           </span>
           <div className="ml-auto"><ThemeToggle /></div>
         </div>

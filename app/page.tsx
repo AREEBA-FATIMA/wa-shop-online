@@ -1,12 +1,12 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { MessageCircle, Zap, Bot, Package, BarChart3, Shield, Clock, ChevronRight, Check, Star } from 'lucide-react';
+import { MessageCircle, Zap, Bot, Package, BarChart3, Shield, Clock, ArrowRight, Check } from 'lucide-react';
 
 const t = {
   en: {
     badge: 'AI-Powered WhatsApp Store',
-    title: 'Turn WhatsApp Into Your Smart Shop',
+    title: 'Your WhatsApp,\nNow a Smart Shop',
     sub: 'Auto-post daily status, let AI answer customers in Urdu, confirm orders — all without WhatsApp API.',
     f1: 'Start Free', f2: 'See Demo',
     features: [
@@ -28,7 +28,7 @@ const t = {
   },
   ur: {
     badge: 'AI WhatsApp Dukaan',
-    title: 'Apna WhatsApp Smart Dukaan Banao',
+    title: 'Apna WhatsApp,\nAb Smart Dukaan',
     sub: 'Roz auto status, AI se jawab, orders track — sab ek jagah se. Koi API key nahi chahiye.',
     f1: 'Free Shuru', f2: 'Demo Dekho',
     features: [
@@ -55,27 +55,32 @@ export default function Landing() {
   const c = t[lang];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       {/* Nav */}
-      <nav className="fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-[#0a0a0a]/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#25D366] flex items-center justify-center">
-              <MessageCircle size={16} className="text-white" />
+      <nav style={{ borderBottom: '0.5px solid var(--border)', background: 'var(--bg2)', backdropFilter: 'blur(12px)' }}
+        className="fixed top-0 inset-x-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 h-15 flex items-center justify-between" style={{ height: '60px' }}>
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--green)' }}>
+              <MessageCircle size={14} className="text-white" />
             </div>
-            <span className="font-bold text-lg">WA-SHOP<span className="text-[#25D366]">.Online</span></span>
+            <span className="brand font-bold text-base" style={{ color: 'var(--text)' }}>
+              WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span>
+            </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex rounded-full border border-white/10 overflow-hidden text-xs">
+            {/* Lang toggle */}
+            <div className="flex rounded-full overflow-hidden text-xs" style={{ border: '0.5px solid var(--border2)' }}>
               {(['en','ur'] as const).map(l => (
                 <button key={l} onClick={() => setLang(l)}
-                  className={`px-3 py-1 transition-colors ${lang===l ? 'bg-[#25D366] text-white' : 'text-gray-400 hover:text-white'}`}>
+                  className="px-3 py-1 font-medium transition-colors"
+                  style={{ background: lang===l ? 'var(--green)' : 'transparent', color: lang===l ? '#fff' : 'var(--text2)' }}>
                   {l === 'en' ? 'EN' : 'UR'}
                 </button>
               ))}
             </div>
-            <Link href="/auth/login" className="text-sm text-gray-300 hover:text-white px-3 py-1">Login</Link>
-            <Link href="/auth/register" className="text-sm bg-[#25D366] hover:bg-[#1da855] text-white px-4 py-2 rounded-full font-medium transition-colors">
+            <Link href="/auth/login" className="text-sm font-medium px-3 py-1" style={{ color: 'var(--text2)' }}>Login</Link>
+            <Link href="/auth/register" className="btn-primary" style={{ padding: '8px 18px', fontSize: '13px', borderRadius: '100px' }}>
               {c.f1}
             </Link>
           </div>
@@ -83,92 +88,113 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-32 pb-20 px-4 text-center">
-        <div className="inline-flex items-center gap-2 bg-[#25D366]/10 border border-[#25D366]/20 rounded-full px-4 py-1.5 mb-6">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
-          <span className="text-[#25D366] text-sm font-medium">{c.badge}</span>
+      <section className="pt-28 pb-16 px-4 text-center">
+        <div className="badge-green mb-5 inline-flex">
+          <span className="dot-live" />
+          {c.badge}
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight max-w-3xl mx-auto">{c.title}</h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-10">{c.sub}</p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/auth/register" className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1da855] text-white px-8 py-4 rounded-full font-semibold text-lg transition-all hover:scale-105">
-            {c.f1} <ChevronRight size={20} />
+        <h1 className="brand font-bold text-5xl md:text-6xl leading-tight max-w-2xl mx-auto mb-5 whitespace-pre-line"
+          style={{ color: 'var(--text)' }}>{c.title}</h1>
+        <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: 'var(--text2)' }}>{c.sub}</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link href="/auth/register" className="btn-primary" style={{ padding: '13px 28px', fontSize: '15px', borderRadius: '100px' }}>
+            {c.f1} <ArrowRight size={16} />
           </Link>
-          <button className="inline-flex items-center gap-2 border border-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/5 transition-all">
+          <button className="btn-ghost" style={{ padding: '13px 28px', fontSize: '15px', borderRadius: '100px' }}>
             {c.f2}
           </button>
         </div>
 
-        {/* WhatsApp mockup */}
-        <div className="max-w-xs mx-auto mt-16">
-          <div className="bg-[#1a1a1a] rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
-            <div className="bg-[#075e54] px-4 py-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-300 flex items-center justify-center text-xs font-bold text-green-900">S</div>
-              <div>
-                <p className="text-white text-sm font-medium">Sara Boutique</p>
-                <p className="text-green-200 text-xs">online</p>
+        {/* WA chat mockup */}
+        <div className="max-w-[260px] mx-auto mt-14">
+          <div className="rounded-2xl overflow-hidden" style={{ border: '0.5px solid var(--border2)', background: 'var(--bg2)' }}>
+            <div className="px-4 py-3 flex items-center gap-3" style={{ background: 'var(--green-dim)', borderBottom: '0.5px solid var(--border)' }}>
+              <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>S</div>
+              <div className="text-left">
+                <p className="text-white text-xs font-semibold">Sara Boutique</p>
+                <p className="text-xs" style={{ color: 'var(--green)' }}>online</p>
               </div>
             </div>
-            <div className="bg-[#0d1117] p-3 space-y-2">
-              <div className="wa-bubble-in p-2 max-w-[80%] text-xs text-gray-300">Yeh shirt available hai?</div>
-              <div className="wa-bubble-out p-2 max-w-[80%] ml-auto text-xs text-green-100">Ji! White cotton Rs.950 mein, 3 pieces baqi hain 🛍️</div>
-              <div className="wa-bubble-in p-2 max-w-[80%] text-xs text-gray-300">800 mein dein ge? 🙏</div>
-              <div className="wa-bubble-out p-2 max-w-[80%] ml-auto text-xs text-green-100">Aapke liye Rs.900 final! Order confirm karein? 😊</div>
+            <div className="p-3 space-y-2" style={{ background: 'var(--bg3)' }}>
+              <div className="wa-bubble-in p-2 max-w-[82%] text-xs" style={{ color: 'var(--text2)' }}>Yeh shirt available hai?</div>
+              <div className="wa-bubble-out p-2 max-w-[82%] ml-auto text-xs" style={{ color: 'var(--text)' }}>Ji! White cotton Rs.950 mein, 3 pieces baqi 🛍️</div>
+              <div className="wa-bubble-in p-2 max-w-[82%] text-xs" style={{ color: 'var(--text2)' }}>800 mein dein ge? 🙏</div>
+              <div className="wa-bubble-out p-2 max-w-[82%] ml-auto text-xs" style={{ color: 'var(--text)' }}>Aapke liye Rs.900 final! Confirm? 😊</div>
             </div>
-            <div className="bg-[#1a1a1a] px-3 py-2 border-t border-white/5 flex items-center gap-2">
-              <div className="flex-1 bg-[#2a2a2a] rounded-full px-3 py-1.5 text-xs text-gray-500">Message</div>
+            <div className="px-3 py-2 flex items-center gap-2" style={{ background: 'var(--bg2)', borderTop: '0.5px solid var(--border)' }}>
+              <div className="flex-1 py-1.5 px-3 text-xs rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>Message</div>
             </div>
           </div>
-          <p className="text-gray-600 text-xs mt-3">AI ne jawab diya — aap ne kuch nahi kiya ✨</p>
+          <p className="text-xs mt-3" style={{ color: 'var(--text3)' }}>AI ne jawab diya — aap ne kuch nahi kiya ✨</p>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="py-12 border-y border-white/5">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','More Sales']].map(([v,l])=>(
-            <div key={l}><p className="text-3xl font-bold text-[#25D366]">{v}</p><p className="text-gray-500 text-sm mt-1">{l}</p></div>
+      <section className="py-10" style={{ borderTop: '0.5px solid var(--border)', borderBottom: '0.5px solid var(--border)' }}>
+        <div className="max-w-3xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {[['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','More Sales']].map(([v,l]) => (
+            <div key={l}>
+              <p className="brand font-bold text-3xl" style={{ color: 'var(--green)' }}>{v}</p>
+              <p className="text-xs mt-1 font-medium" style={{ color: 'var(--text3)' }}>{l}</p>
+            </div>
           ))}
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4 max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">Features</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {c.features.map((f,i) => (
-            <div key={i} className="bg-[#111] border border-white/8 rounded-2xl p-6 hover:border-[#25D366]/30 transition-all group">
-              <div className="w-10 h-10 rounded-xl bg-[#25D366]/10 flex items-center justify-center text-[#25D366] mb-4 group-hover:bg-[#25D366]/20 transition-colors">
-                <f.icon size={20} />
+      <section className="py-16 px-4 max-w-5xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="badge-green mb-3 inline-flex">Features</p>
+          <h2 className="brand font-bold text-3xl" style={{ color: 'var(--text)' }}>Sab kuch ek jagah</h2>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {c.features.map((f, i) => (
+            <div key={i} className="card p-5 group hover:border-[var(--border2)] transition-all">
+              <div className="icon-box mb-3">
+                <f.icon size={16} strokeWidth={2} />
               </div>
-              <h3 className="font-semibold mb-2">{f.t}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{f.d}</p>
+              <h3 className="font-semibold text-sm mb-1" style={{ color: 'var(--text)' }}>{f.t}</h3>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--text3)' }}>{f.d}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* Pricing */}
-      <section className="py-20 px-4 bg-[#060606]">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">Pricing — PKR</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {c.plans.map((p,i)=>(
-              <div key={i} className={`relative rounded-2xl p-6 border ${p.hot ? 'border-[#25D366] bg-[#25D366]/5' : 'border-white/10 bg-[#111]'}`}>
-                {p.hot && <div className="absolute -top-3 left-1/2 -translate-x-1/2"><span className="bg-[#25D366] text-white text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1"><Star size={10} fill="white"/>Most Popular</span></div>}
-                <h3 className="font-bold text-lg mb-1">{p.name}</h3>
-                <div className="flex items-end gap-1 mb-6">
-                  <span className="text-3xl font-bold">Rs.{p.price}</span>
-                  <span className="text-gray-500 text-sm mb-1">{p.per}</span>
+      <section className="py-16 px-4" style={{ background: 'var(--bg2)' }}>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="badge-green mb-3 inline-flex">Pricing</p>
+            <h2 className="brand font-bold text-3xl" style={{ color: 'var(--text)' }}>Pricing — PKR</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            {c.plans.map((p, i) => (
+              <div key={i} className="relative rounded-[16px] p-5"
+                style={{
+                  background: p.hot ? 'var(--green-dim)' : 'var(--bg3)',
+                  border: `0.5px solid ${p.hot ? 'rgba(61,186,94,0.4)' : 'var(--border)'}`,
+                }}>
+                {p.hot && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <span className="badge-green text-xs px-3 py-1">Most Popular</span>
+                  </div>
+                )}
+                <h3 className="font-bold text-base mb-1" style={{ color: 'var(--text)' }}>{p.name}</h3>
+                <div className="flex items-end gap-1 mb-5">
+                  <span className="brand font-bold text-3xl" style={{ color: 'var(--text)' }}>Rs.{p.price}</span>
+                  <span className="text-xs mb-1" style={{ color: 'var(--text3)' }}>{p.per}</span>
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {p.f.map((ft,j)=>(
-                    <li key={j} className="flex items-center gap-2 text-sm text-gray-300">
-                      <Check size={14} className="text-[#25D366] shrink-0"/>{ft}
+                <ul className="space-y-2.5 mb-6">
+                  {p.f.map((ft, j) => (
+                    <li key={j} className="flex items-center gap-2 text-xs" style={{ color: 'var(--text2)' }}>
+                      <Check size={13} strokeWidth={2.5} style={{ color: 'var(--green)', flexShrink: 0 }} />{ft}
                     </li>
                   ))}
                 </ul>
-                <Link href="/auth/register" className={`block text-center py-3 rounded-xl font-medium transition-all ${p.hot ? 'bg-[#25D366] hover:bg-[#1da855] text-white' : 'border border-white/20 text-white hover:bg-white/5'}`}>
+                <Link href="/auth/register"
+                  className={p.hot ? 'btn-primary w-full justify-center' : 'btn-ghost w-full justify-center'}
+                  style={{ display: 'flex', width: '100%' }}>
                   {p.cta}
                 </Link>
               </div>
@@ -177,12 +203,15 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="py-10 px-4 border-t border-white/5 text-center">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-[#25D366] flex items-center justify-center"><MessageCircle size={14} className="text-white"/></div>
-          <span className="font-bold">WA-SHOP<span className="text-[#25D366]">.Online</span></span>
+      {/* Footer */}
+      <footer className="py-8 px-4 text-center" style={{ borderTop: '0.5px solid var(--border)' }}>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--green)' }}>
+            <MessageCircle size={12} className="text-white" />
+          </div>
+          <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span></span>
         </div>
-        <p className="text-gray-600 text-sm">Pakistan ka pehla AI WhatsApp reseller platform. © 2025</p>
+        <p className="text-xs" style={{ color: 'var(--text3)' }}>Pakistan ka pehla AI WhatsApp reseller platform. © 2025</p>
       </footer>
     </div>
   );
