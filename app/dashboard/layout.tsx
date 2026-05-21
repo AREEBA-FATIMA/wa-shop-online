@@ -34,18 +34,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
 
-  async function tryReconnectWA(userId: string) {
-    setWaLoading(true);
-    try {
-      await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' });
-      await new Promise(r => setTimeout(r, 5000));
-      const r = await fetch(`${WA_URL}/wa/status/${userId}`);
-      const d = await r.json();
-      setWaConnected(!!d.connected);
-    } catch { setWaConnected(false); }
-    setWaLoading(false);
-  }
-
   useEffect(() => {
     const u = localStorage.getItem('wa_user');
     if (!u) { router.push('/auth/login'); return; }
@@ -55,8 +43,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       try {
         const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
         const d = await r.json();
-        if (d.connected) setWaConnected(true);
-        else await tryReconnectWA(parsed.id);
+        setWaConnected(!!d.connected);
       } catch { setWaConnected(false); }
     }
     checkWA();

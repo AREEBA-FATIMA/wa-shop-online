@@ -167,7 +167,7 @@ export default function ConnectWA() {
     const userId = getUserId();
     if (!userId) { router.push('/auth/login'); return; }
 
-    async function checkAndReconnect() {
+    async function checkStatus() {
       try {
         const r = await fetch(`${WA_URL}/wa/status/${userId}`);
         const d = await r.json();
@@ -175,20 +175,10 @@ export default function ConnectWA() {
           router.push('/dashboard');
           return;
         }
-        setStatus('loading'); setStep(1);
-        await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' });
-        await new Promise(res => setTimeout(res, 4000));
-        const r2 = await fetch(`${WA_URL}/wa/status/${userId}`);
-        const d2 = await r2.json();
-        if (d2.connected) {
-          router.push('/dashboard');
-        } else {
-          setStatus('idle'); setStep(0);
-        }
-      } catch { setStatus('idle'); }
+      } catch {}
+      setStep(1);
     }
-
-    checkAndReconnect();
+    checkStatus();
     return () => { esRef.current?.close(); clearAllTimers(); };
   }, []);
 
