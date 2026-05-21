@@ -74,7 +74,8 @@ export default function SettingsPage() {
           <User size={15} /> Profile
         </h2>
         <div className="flex items-center gap-3 p-3 rounded-xl mb-4" style={{ background: 'var(--bg3)' }}>
-          <div className="w-11 h-11 rounded-full bg-[#25D366] flex items-center justify-center text-white font-bold text-base shrink-0">
+          <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base shrink-0"
+            style={{ background: 'var(--green-gradient)' }}>
             {(form.name || userData?.name || '?')[0].toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -91,14 +92,12 @@ export default function SettingsPage() {
           <div>
             <label className="text-xs mb-1 block" style={{ color: 'var(--text3)' }}>Naam</label>
             <input value={form.name} onChange={e => upd('name', e.target.value)}
-              className="w-full rounded-xl px-3 py-2.5 text-sm border focus:outline-none focus:border-[#25D366]"
-              style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }} />
+              className="field" />
           </div>
           <div>
             <label className="text-xs mb-1 block" style={{ color: 'var(--text3)' }}>Phone (change nahi ho sakta)</label>
             <input value={userData?.phone || ''} disabled
-              className="w-full rounded-xl px-3 py-2.5 text-sm border opacity-50 cursor-not-allowed"
-              style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text3)' }} />
+              className="field opacity-50 cursor-not-allowed" />
           </div>
         </div>
       </div>
@@ -122,7 +121,7 @@ export default function SettingsPage() {
               {userData?.plan === 'free' && (
                 <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Premium upgrade ke liye admin se rabta karein</p>
               )}
-              {isPremium && <p className="text-xs mt-1 text-[#25D366]">✓ Tamam features available hain</p>}
+              {isPremium && <p className="text-xs mt-1" style={{ color: 'var(--green)' }}>✓ Tamam features available hain</p>}
             </div>
             {isPremium && <ShieldCheck size={20} className="text-yellow-400" />}
           </div>
@@ -148,8 +147,7 @@ export default function SettingsPage() {
           <div>
             <label className="text-xs mb-1 block" style={{ color: 'var(--text3)' }}>Language select karein</label>
             <select value={form.language} onChange={e => upd('language', e.target.value)}
-              className="w-full rounded-xl px-3 py-2.5 text-sm border focus:outline-none focus:border-[#25D366]"
-              style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+              className="field">
               <option value="roman_ur">Roman Urdu (Urdu English haroof mein)</option>
               <option value="urdu">اردو (Asli Urdu)</option>
               <option value="en">English</option>
@@ -169,8 +167,8 @@ export default function SettingsPage() {
               </div>
             </div>
             <div onClick={() => upd('ai_auto_reply', !form.ai_auto_reply)}
-              className={`w-11 h-6 rounded-full flex items-center px-0.5 cursor-pointer shrink-0 transition-colors ${form.ai_auto_reply ? 'bg-[#25D366]' : 'bg-gray-600'}`}>
-              <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${form.ai_auto_reply ? 'translate-x-5' : 'translate-x-0'}`} />
+              className={`toggle ${form.ai_auto_reply ? 'on' : 'off'}`}>
+              <div className="knob" />
             </div>
           </div>
         </div>
@@ -181,10 +179,12 @@ export default function SettingsPage() {
         <h2 className="font-semibold text-sm mb-4 flex items-center gap-2" style={{ color: 'var(--text)' }}>
           <Wifi size={15} /> WhatsApp Connection
         </h2>
-        <div className={`flex items-center gap-3 p-3 rounded-xl mb-3 ${waStatus?.connected ? 'bg-[#25D366]/10' : 'bg-red-500/10'}`}>
-          {waStatus?.connected ? <Wifi size={16} className="text-[#25D366]" /> : <WifiOff size={16} className="text-red-400" />}
+        <div className={`flex items-center gap-3 p-3 rounded-xl mb-3 ${waStatus?.connected ? '' : ''}`}
+          style={{ background: waStatus?.connected ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)' }}>
+          {waStatus?.connected ? <Wifi size={16} style={{ color: 'var(--green)' }} /> : <WifiOff size={16} style={{ color: '#e05a5a' }} />}
           <div>
-            <p className={`font-medium text-sm ${waStatus?.connected ? 'text-[#25D366]' : 'text-red-400'}`}>
+            <p className={`font-medium text-sm`}
+              style={{ color: waStatus?.connected ? 'var(--green)' : '#e05a5a' }}>
               {waStatus?.connected ? `Connected — ${waStatus.phone || ''}` : 'Connected nahi hai'}
             </p>
             <p className="text-xs" style={{ color: 'var(--text3)' }}>
@@ -199,7 +199,7 @@ export default function SettingsPage() {
           </button>
         ) : (
           <Link href="/connect-wa"
-            className="inline-block bg-[#25D366] hover:bg-[#1da855] text-white text-sm px-4 py-2 rounded-xl transition-colors">
+            className="btn-primary text-sm">
             WhatsApp Connect karein →
           </Link>
         )}
@@ -207,7 +207,7 @@ export default function SettingsPage() {
 
       {/* Save */}
       <button onClick={save} disabled={saving}
-        className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1da855] disabled:opacity-50 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+        className="btn-primary" style={{ padding: '12px 28px' }}>
         {saving ? <Loader2 size={16} className="animate-spin" /> : saved ? <Check size={16} /> : null}
         {saved ? '✅ Saved!' : 'Save Karein'}
       </button>

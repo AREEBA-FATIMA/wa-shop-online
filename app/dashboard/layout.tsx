@@ -2,17 +2,26 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw } from 'lucide-react';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, Store } from 'lucide-react';
 import { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const NAV = [
-  { href: '/dashboard', icon: Home, label: 'Dashboard' },
+  { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats' },
   { href: '/dashboard/products', icon: Package, label: 'Products' },
-  { href: '/dashboard/status', icon: Radio, label: 'Status Post' },
   { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
+  { href: '/dashboard/status', icon: Radio, label: 'Status' },
   { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+];
+
+// Bottom nav subset (mobile)
+const BOTTOM_NAV = [
+  { href: '/dashboard', icon: Home, label: 'Home' },
+  { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats' },
+  { href: '/dashboard/products', icon: Package, label: 'Products' },
+  { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -29,9 +38,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   async function tryReconnectWA(userId: string) {
     setWaLoading(true);
     try {
-      // Pehle restart karo (session preserve hoti hai)
       await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' });
-      // 5 sec wait karo reconnect hone ke liye
       await new Promise(r => setTimeout(r, 5000));
       const r = await fetch(`${WA_URL}/wa/status/${userId}`);
       const d = await r.json();
@@ -55,12 +62,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         if (d.connected) {
           setWaConnected(true);
         } else {
-          // Disconnected hai — auto-reconnect try karo
-          console.log('[Dashboard] WA disconnected, trying auto-reconnect...');
           await tryReconnectWA(parsed.id);
         }
       } catch (e) {
-        // WA service unavailable — 30 sec baad dobara try karega
         setWaConnected(false);
       }
     }
@@ -77,25 +81,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [path]);
+
   function logout() { removeToken(); router.push('/'); }
 
   return (
-    <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      {/* ─── Desktop Sidebar ─── */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed md:static inset-y-0 left-0 z-30 w-56 flex flex-col transition-transform duration-200
+      <aside className={`fixed md:static inset-y-0 left-0 z-30 w-60 flex flex-col transition-transform duration-200
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         style={{ background: 'var(--bg2)', borderRight: '0.5px solid var(--border)' }}>
 
         {/* Logo */}
         <div className="h-16 flex items-center px-5 gap-2.5" style={{ borderBottom: '0.5px solid var(--border)' }}>
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--green)' }}>
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--green-gradient)' }}>
             <MessageCircle size={14} className="text-white" />
           </div>
           <span className="brand font-bold text-base" style={{ color: 'var(--text)' }}>
-            WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span>
+            WA<span className="gradient-text-green">SHOP</span>
           </span>
           <div className="ml-auto"><ThemeToggle /></div>
         </div>
@@ -125,13 +134,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               color: waConnected ? 'var(--green)' : '#e05a5a',
               border: `0.5px solid ${waConnected ? 'rgba(61,186,94,0.2)' : 'rgba(220,50,50,0.2)'}`,
             }}
-            onClick={e => {
-              if (waLoading) e.preventDefault();
-            }}>
+            onClick={e => { if (waLoading) e.preventDefault(); }}>
             {waLoading ? (
               <><RefreshCw size={13} className="animate-spin" />Reconnecting...</>
             ) : waConnected ? (
-              <><span className="dot-live" /><Wifi size={13} />WhatsApp Connected</>
+              <><span className="dot-live" /><Wifi size={13} />Connected</>
             ) : (
               <><WifiOff size={13} />Connect WhatsApp</>
             )}
@@ -152,18 +159,52 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* ─── Main Content Area ─── */}
+      <div className="flex-1 flex flex-col min-w-0 md:ml-0 pb-16 md:pb-0">
         {/* Mobile topbar */}
-        <div className="md:hidden h-14 flex items-center px-4 gap-3" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
+        <div className="md:hidden h-14 flex items-center px-4 gap-3 sticky top-0 z-10"
+          style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
           <button onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text2)' }}>
             <Menu size={20} />
           </button>
-          <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>
-            WA-SHOP<span style={{ color: 'var(--green)' }}>.Online</span>
-          </span>
-          <div className="ml-auto"><ThemeToggle /></div>
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--green-gradient)' }}>
+              <Store size={12} className="text-white" />
+            </div>
+            <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>
+              WA<span className="gradient-text-green">SHOP</span>
+            </span>
+          </Link>
+
+          <div className="ml-auto flex items-center gap-2">
+            {/* WA status dot */}
+            <Link href="/connect-wa" className="relative">
+              <div className={`w-2 h-2 rounded-full ${waLoading ? 'animate-pulse' : ''}`}
+                style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} />
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
-        <main className="flex-1 overflow-auto">{children}</main>
+
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
+
+      {/* ─── Bottom Tab Nav (Mobile Only) ─── */}
+      <div className="bottom-nav md:hidden">
+        <div className="bottom-nav-inner">
+          {BOTTOM_NAV.map(n => {
+            const active = path === n.href || (n.href !== '/dashboard' && path.startsWith(n.href));
+            return (
+              <Link key={n.href} href={n.href}
+                className={`bottom-nav-item ${active ? 'active' : ''}`}>
+                <n.icon size={20} strokeWidth={active ? 2.5 : 1.8} />
+                <span>{n.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

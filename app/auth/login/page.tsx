@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api, { setToken } from '@/lib/api';
-import { MessageCircle, Phone, Lock, Loader2 } from 'lucide-react';
+import { MessageCircle, Phone, Lock, Loader2, ArrowRight } from 'lucide-react';
 
 export default function Login() {
   const router = useRouter();
@@ -30,68 +30,78 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--bg)' }}>
-      <div className="w-full max-w-[340px]">
-        {/* Logo mark */}
-        <div className="text-center mb-8">
-          <div className="w-11 h-11 rounded-[14px] flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'var(--green)', boxShadow: '0 8px 24px rgba(61,186,94,0.25)' }}>
-            <MessageCircle size={20} className="text-white" />
+    <div className="min-h-screen flex">
+      {/* Left — Branding/Illustration */}
+      <div className="hidden lg:flex w-1/2 items-center justify-center p-12 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #075E54, #128C7E, #25D366)' }}>
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }} />
+        <div className="relative text-center text-white">
+          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mx-auto mb-6">
+            <MessageCircle size={32} className="text-white" />
           </div>
-          <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>WA-SHOP</h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>Apne account mein login karein</p>
+          <h2 className="brand font-bold text-4xl mb-3">Welcome Back!</h2>
+          <p className="text-white/70 max-w-sm">Apne WhatsApp business ko manage karein — AI ke sath</p>
         </div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text2)' }}>Phone Number</label>
-            <div className="relative">
-              <Phone size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
+      {/* Right — Form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-8" style={{ background: 'var(--bg)' }}>
+        <div className="w-full max-w-sm animate-fade-in">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 lg:hidden"
+              style={{ background: 'var(--green-gradient)', boxShadow: '0 8px 24px rgba(37,211,102,0.25)' }}>
+              <MessageCircle size={24} className="text-white" />
+            </div>
+            <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>Login</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>Apne account mein wapas aayein</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="floating-label">
               <input
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
-                placeholder="03001234567"
-                className="field pl-9"
+                placeholder=" "
+                className="field"
                 required
               />
+              <label><Phone size={12} style={{ display: 'inline', marginRight: 4 }} />Phone Number</label>
             </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text2)' }}>Password</label>
-            <div className="relative">
-              <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
+            <div className="floating-label">
               <input
                 value={pass}
                 onChange={e => setPass(e.target.value)}
                 type="password"
-                placeholder="••••••••"
-                className="field pl-9"
+                placeholder=" "
+                className="field"
                 required
               />
+              <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />Password</label>
             </div>
-          </div>
 
-          {err && (
-            <p className="text-xs text-center py-2 px-3 rounded-[8px]"
-              style={{ background: 'rgba(220,50,50,0.08)', color: '#e05a5a', border: '0.5px solid rgba(220,50,50,0.2)' }}>
-              {err}
-            </p>
-          )}
+            {err && (
+              <p className="text-xs text-center py-2.5 px-3 rounded-lg"
+                style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444', border: '0.5px solid rgba(239,68,68,0.2)' }}>
+                {err}
+              </p>
+            )}
 
-          <button type="submit" disabled={loading}
-            className="btn-primary w-full justify-center mt-1"
-            style={{ opacity: loading ? 0.7 : 1 }}>
-            {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-            Login
-          </button>
-        </form>
+            <button type="submit" disabled={loading}
+              className="btn-primary-gradient w-full justify-center"
+              style={{ opacity: loading ? 0.7 : 1 }}>
+              {loading ? <Loader2 size={16} className="animate-spin" /> : null}
+              Login <ArrowRight size={16} />
+            </button>
+          </form>
 
-        <p className="text-center text-xs mt-5" style={{ color: 'var(--text3)' }}>
-          Account nahi hai?{' '}
-          <Link href="/auth/register" className="font-semibold" style={{ color: 'var(--green)' }}>
-            Register karein
-          </Link>
-        </p>
+          <p className="text-center text-xs mt-6" style={{ color: 'var(--text3)' }}>
+            Account nahi hai?{' '}
+            <Link href="/auth/register" className="font-semibold" style={{ color: 'var(--green)' }}>
+              Register karein
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
