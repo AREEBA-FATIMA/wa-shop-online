@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, Store } from 'lucide-react';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X } from 'lucide-react';
 import { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -16,7 +16,6 @@ const NAV = [
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
-// Bottom nav subset (mobile)
 const BOTTOM_NAV = [
   { href: '/dashboard', icon: Home, label: 'Home' },
   { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats' },
@@ -43,9 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const r = await fetch(`${WA_URL}/wa/status/${userId}`);
       const d = await r.json();
       setWaConnected(!!d.connected);
-    } catch (e) {
-      setWaConnected(false);
-    }
+    } catch { setWaConnected(false); }
     setWaLoading(false);
   }
 
@@ -54,156 +51,134 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!u) { router.push('/auth/login'); return; }
     const parsed = JSON.parse(u);
     setUser(parsed);
-
     async function checkWA() {
       try {
         const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
         const d = await r.json();
-        if (d.connected) {
-          setWaConnected(true);
-        } else {
-          await tryReconnectWA(parsed.id);
-        }
-      } catch (e) {
-        setWaConnected(false);
-      }
+        if (d.connected) setWaConnected(true);
+        else await tryReconnectWA(parsed.id);
+      } catch { setWaConnected(false); }
     }
-
     checkWA();
     const interval = setInterval(async () => {
-      try {
-        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
-        const d = await r.json();
-        setWaConnected(!!d.connected);
-      } catch (e) {}
+      try { const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`); const d = await r.json(); setWaConnected(!!d.connected); } catch {}
     }, 30000);
-
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [path]);
+  useEffect(() => { setSidebarOpen(false); }, [path]);
 
   function logout() { removeToken(); router.push('/'); }
 
   return (
     <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
-      {/* ─── Desktop Sidebar ─── */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
-      )}
+      {/* Mobile overlay */}
+      {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm animate-fade-in" onClick={() => setSidebarOpen(false)} />}
 
-      <aside className={`fixed md:static inset-y-0 left-0 z-30 w-60 flex flex-col transition-transform duration-200
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+      {/* ─── Sidebar ─── */}
+      <aside className={`fixed md:relative inset-y-0 left-0 z-30 w-64 flex flex-col transition-all duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
         style={{ background: 'var(--bg2)', borderRight: '0.5px solid var(--border)' }}>
-
-        {/* Logo */}
-        <div className="h-16 flex items-center px-5 gap-2.5" style={{ borderBottom: '0.5px solid var(--border)' }}>
-          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'var(--green-gradient)' }}>
-            <MessageCircle size={14} className="text-white" />
-          </div>
-          <span className="brand font-bold text-base" style={{ color: 'var(--text)' }}>
-            WA<span className="gradient-text-green">SHOP</span>
+        
+        {/* Logo + close */}
+        <div className="h-16 flex items-center px-5 gap-3" style={{ borderBottom: '0.5px solid var(--border)' }}>
+          <span className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--green-gradient)' }}>
+            <MessageCircle size={16} className="text-white" />
           </span>
-          <div className="ml-auto"><ThemeToggle /></div>
+          <span className="brand font-bold text-lg" style={{ color: 'var(--text)' }}>WA<span className="gradient-text-green">SHOP</span></span>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden ml-auto p-1" style={{ color: 'var(--text3)' }}><X size={18} /></button>
+        </div>
+
+        {/* User card */}
+        <div className="mx-3 mt-3 p-3 rounded-xl flex items-center gap-3" style={{ background: 'var(--bg3)' }}>
+          <span className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
+            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{user?.name || 'User'}</p>
+            <p className="text-xs capitalize" style={{ color: 'var(--text3)' }}>{user?.plan || 'free'} plan</p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Link href="/connect-wa" className="relative">
+              <span className={`w-2 h-2 rounded-full block ${waLoading ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} />
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          <p className="text-xs font-600 px-3 mb-2 mt-1" style={{ color: 'var(--text3)', letterSpacing: '0.08em' }}>MENU</p>
+        <nav className="flex-1 px-3 pt-3 pb-2 space-y-0.5 overflow-y-auto">
+          <p className="text-[10px] font-semibold tracking-widest px-3 mb-2 uppercase" style={{ color: 'var(--text3)' }}>Menu</p>
           {NAV.map(n => {
             const active = path === n.href;
             return (
-              <Link key={n.href} href={n.href} onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-sm font-medium transition-all ${active ? 'nav-active' : 'hover:opacity-80'}`}
-                style={{ color: active ? 'var(--green)' : 'var(--text2)' }}>
-                <n.icon size={16} strokeWidth={active ? 2.5 : 1.8} />
-                {n.label}
+              <Link key={n.href} href={n.href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${active ? '' : 'hover:opacity-80'}`}
+                style={{ background: active ? 'var(--green-dim)' : 'transparent', color: active ? 'var(--green)' : 'var(--text2)' }}>
+                <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: active ? 'var(--green)' : 'var(--bg3)', color: active ? '#fff' : 'var(--text3)' }}>
+                  <n.icon size={15} strokeWidth={active ? 2.5 : 1.8} />
+                </span>
+                <span className="flex-1">{n.label}</span>
+                {active && <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'var(--green)' }} />}
               </Link>
             );
           })}
         </nav>
 
         {/* Footer */}
-        <div className="p-3 space-y-2" style={{ borderTop: '0.5px solid var(--border)' }}>
+        <div className="p-3 space-y-1.5" style={{ borderTop: '0.5px solid var(--border)' }}>
           <Link href="/connect-wa"
-            className={`flex items-center gap-2 px-3 py-2 rounded-[10px] text-xs font-medium transition-all`}
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all"
             style={{
               background: waConnected ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
               color: waConnected ? 'var(--green)' : '#e05a5a',
-              border: `0.5px solid ${waConnected ? 'rgba(61,186,94,0.2)' : 'rgba(220,50,50,0.2)'}`,
-            }}
-            onClick={e => { if (waLoading) e.preventDefault(); }}>
+            }}>
             {waLoading ? (
-              <><RefreshCw size={13} className="animate-spin" />Reconnecting...</>
+              <><RefreshCw size={14} className="animate-spin" />Reconnecting...</>
             ) : waConnected ? (
-              <><span className="dot-live" /><Wifi size={13} />Connected</>
+              <><span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)' }} /><Wifi size={14} />WhatsApp Connected</>
             ) : (
-              <><WifiOff size={13} />Connect WhatsApp</>
+              <><WifiOff size={14} />Connect WhatsApp</>
             )}
+            <ChevronRight size={14} className="ml-auto" />
           </Link>
-          <div className="flex items-center gap-2.5 px-3 py-2">
-            <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-              style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold truncate" style={{ color: 'var(--text)' }}>{user?.name || 'User'}</p>
-              <p className="text-xs capitalize" style={{ color: 'var(--text3)' }}>{user?.plan || 'free'} plan</p>
-            </div>
-            <button onClick={logout} className="transition-opacity hover:opacity-70" style={{ color: '#e05a5a' }}>
-              <LogOut size={14} />
-            </button>
-          </div>
+          <button onClick={logout} className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs font-medium transition-all hover:opacity-70" style={{ color: '#e05a5a' }}>
+            <LogOut size={14} /> Logout
+          </button>
         </div>
       </aside>
 
-      {/* ─── Main Content Area ─── */}
-      <div className="flex-1 flex flex-col min-w-0 md:ml-0 pb-16 md:pb-0">
-        {/* Mobile topbar */}
-        <div className="md:hidden h-14 flex items-center px-4 gap-3 sticky top-0 z-10"
-          style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
-          <button onClick={() => setSidebarOpen(true)} style={{ color: 'var(--text2)' }}>
-            <Menu size={20} />
-          </button>
+      {/* ─── Main ─── */}
+      <div className="flex-1 flex flex-col min-w-0 pb-[60px] md:pb-0">
+        {/* Mobile top bar */}
+        <header className="md:hidden h-14 flex items-center px-4 gap-3 sticky top-0 z-10" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
+          <button onClick={() => setSidebarOpen(true)} className="p-1 -ml-1" style={{ color: 'var(--text2)' }}><Menu size={20} /></button>
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--green-gradient)' }}>
-              <Store size={12} className="text-white" />
-            </div>
-            <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>
-              WA<span className="gradient-text-green">SHOP</span>
+            <span className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: 'var(--green-gradient)' }}>
+              <MessageCircle size={12} className="text-white" />
             </span>
+            <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>WA<span className="gradient-text-green">SHOP</span></span>
           </Link>
-
           <div className="ml-auto flex items-center gap-2">
-            {/* WA status dot */}
-            <Link href="/connect-wa" className="relative">
-              <div className={`w-2 h-2 rounded-full ${waLoading ? 'animate-pulse' : ''}`}
-                style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} />
-            </Link>
+            <Link href="/connect-wa"><span className={`w-2 h-2 rounded-full block ${waLoading ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} /></Link>
             <ThemeToggle />
           </div>
-        </div>
+        </header>
 
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
 
-      {/* ─── Bottom Tab Nav (Mobile Only) ─── */}
-      <div className="bottom-nav md:hidden">
+      {/* ─── Bottom Nav ─── */}
+      <nav className="bottom-nav md:hidden">
         {BOTTOM_NAV.map(n => {
           const active = path === n.href || (n.href !== '/dashboard' && path.startsWith(n.href));
           return (
-            <Link key={n.href} href={n.href}
-              className={active ? 'active' : ''}>
+            <Link key={n.href} href={n.href} className={active ? 'active' : ''}>
               <n.icon size={20} strokeWidth={active ? 2.5 : 1.8} />
               <span>{n.label}</span>
             </Link>
           );
         })}
-      </div>
+      </nav>
     </div>
   );
 }
