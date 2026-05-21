@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio } from 'lucide-react';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw } from 'lucide-react';
 import { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -21,23 +21,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [waConnected, setWaConnected] = useState(false);
+  const [waLoading, setWaLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
+
+  async function tryReconnectWA(userId: string) {
+    setWaLoading(true);
+    try {
+      // Pehle restart karo (session preserve hoti hai)
+      await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' });
+      // 5 sec wait karo reconnect hone ke liye
+      await new Promise(r => setTimeout(r, 5000));
+      const r = await fetch(`${WA_URL}/wa/status/${userId}`);
+      const d = await r.json();
+      setWaConnected(!!d.connected);
+    } catch (e) {
+      setWaConnected(false);
+    }
+    setWaLoading(false);
+  }
 
   useEffect(() => {
     const u = localStorage.getItem('wa_user');
     if (!u) { router.push('/auth/login'); return; }
     const parsed = JSON.parse(u);
     setUser(parsed);
-    function checkWA() {
-      fetch(`${WA_URL}/wa/status/${parsed.id}`)
-        .then(r => r.json())
-        .then(d => setWaConnected(!!d.connected))
-        .catch(() => {});
+
+    async function checkWA() {
+      try {
+        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
+        const d = await r.json();
+        if (d.connected) {
+          setWaConnected(true);
+        } else {
+          // Disconnected hai — auto-reconnect try karo
+          console.log('[Dashboard] WA disconnected, trying auto-reconnect...');
+          await tryReconnectWA(parsed.id);
+        }
+      } catch (e) {
+        // WA service unavailable — 30 sec baad dobara try karega
+        setWaConnected(false);
+      }
     }
+
     checkWA();
-    const interval = setInterval(checkWA, 30000);
+    const interval = setInterval(async () => {
+      try {
+        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
+        const d = await r.json();
+        setWaConnected(!!d.connected);
+      } catch (e) {}
+    }, 30000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -83,17 +119,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Footer */}
         <div className="p-3 space-y-2" style={{ borderTop: '0.5px solid var(--border)' }}>
           <Link href="/connect-wa"
-            className={`flex items-center gap-2 px-3 py-2 rounded-[10px] text-xs font-medium transition-all
-              ${waConnected ? '' : ''}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-[10px] text-xs font-medium transition-all`}
             style={{
               background: waConnected ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
               color: waConnected ? 'var(--green)' : '#e05a5a',
               border: `0.5px solid ${waConnected ? 'rgba(61,186,94,0.2)' : 'rgba(220,50,50,0.2)'}`,
+            }}
+            onClick={e => {
+              if (waLoading) e.preventDefault();
             }}>
-            {waConnected
-              ? <><span className="dot-live" /><Wifi size={13} />WhatsApp Connected</>
-              : <><WifiOff size={13} />Connect WhatsApp</>
-            }
+            {waLoading ? (
+              <><RefreshCw size={13} className="animate-spin" />Reconnecting...</>
+            ) : waConnected ? (
+              <><span className="dot-live" /><Wifi size={13} />WhatsApp Connected</>
+            ) : (
+              <><WifiOff size={13} />Connect WhatsApp</>
+            )}
           </Link>
           <div className="flex items-center gap-2.5 px-3 py-2">
             <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
