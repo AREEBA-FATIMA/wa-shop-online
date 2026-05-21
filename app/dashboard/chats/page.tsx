@@ -64,7 +64,6 @@ export default function ChatsPage() {
     if (!userId || !lastMsg) return;
     try {
       const user = JSON.parse(localStorage.getItem('wa_user') || '{}');
-      // Build history from current messages for context
       const history = messages.slice(-10).map(m => ({
         role: m.from_customer ? 'user' : 'assistant',
         content: m.content
@@ -112,7 +111,6 @@ export default function ChatsPage() {
     }
   }, [active]);
 
-  // Auto-suggest AI reply when new customer message arrives
   useEffect(() => {
     if (!active || messages.length === 0) return;
     const last = messages[messages.length - 1];
@@ -128,53 +126,60 @@ export default function ChatsPage() {
   return (
     <div className="flex h-[calc(100vh-0px)] md:h-screen overflow-hidden">
       {/* Chat list */}
-      <div className={`${active ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-80 bg-[#111] border-r border-white/8 shrink-0`}>
-        <div className="p-4 border-b border-white/8">
-          <h2 className="font-bold text-white mb-3">Chats</h2>
+      <div className={`${active ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-80 shrink-0 border-r`}
+        style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}>
+        <div className="p-4" style={{ borderBottom: '0.5px solid var(--border)' }}>
+          <h2 className="font-bold mb-3" style={{ color: 'var(--text)' }}>Chats</h2>
           <div className="relative">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..."
-              className="w-full bg-[#1a1a1a] border border-white/10 rounded-xl pl-8 pr-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#25D366]" />
+              className="field pl-8 py-2" />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto">
           {loading ? (
             <div className="p-4 space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-16 bg-[#1a1a1a] rounded-xl animate-pulse" />)}
+              {[1,2,3].map(i => <div key={i} className="h-16 rounded-xl skeleton" />)}
             </div>
           ) : filtered.length === 0 ? (
             <div className="p-8 text-center">
-              <MessageCircle size={32} className="text-gray-700 mx-auto mb-3" />
-              <p className="text-gray-600 text-sm">Koi chat nahi</p>
-              <p className="text-gray-700 text-xs mt-1">Jab customers message karenge yahan dikhega</p>
+              <MessageCircle size={32} className="mx-auto mb-3" style={{ color: 'var(--text3)' }} />
+              <p className="text-sm" style={{ color: 'var(--text3)' }}>Koi chat nahi</p>
+              <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Jab customers message karenge yahan dikhega</p>
             </div>
           ) : (
             filtered.map(chat => (
               <button key={chat.id} onClick={() => selectChat(chat)}
-                className={`w-full flex items-start gap-3 p-4 hover:bg-white/5 transition-colors text-left border-b border-white/5
-                  ${active?.id === chat.id ? 'bg-[#25D366]/10' : ''}`}>
-                <div className="w-10 h-10 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] font-bold text-sm shrink-0">
+                className={`w-full flex items-start gap-3 p-4 transition-colors text-left`}
+                style={{
+                  borderBottom: '0.5px solid var(--border)',
+                  background: active?.id === chat.id ? 'var(--green-dim)' : 'transparent',
+                }}>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                  style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
                   {chat.customer_name?.charAt(0)?.toUpperCase() || chat.customer_phone.slice(-2)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-white text-sm font-medium truncate">
+                    <span className="text-sm font-medium truncate" style={{ color: 'var(--text)' }}>
                       {chat.customer_name || chat.customer_phone}
                     </span>
-                    <span className="text-gray-600 text-xs shrink-0 ml-2">{timeAgo(chat.last_message_at)}</span>
+                    <span className="text-xs shrink-0 ml-2" style={{ color: 'var(--text3)' }}>{timeAgo(chat.last_message_at)}</span>
                   </div>
-                  <p className="text-gray-500 text-xs truncate">{chat.last_message}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--text3)' }}>{chat.last_message}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                   {chat.unread_count > 0 && (
-                    <div className="w-5 h-5 rounded-full bg-[#25D366] text-white text-xs flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                      style={{ background: 'var(--green)' }}>
                       {chat.unread_count}
                     </div>
                   )}
                   <button
                     onClick={(e) => deleteChat(chat.id, e)}
-                    className="p-1 text-gray-700 hover:text-red-400 transition-colors rounded"
+                    className="p-1 transition-colors rounded hover:opacity-70"
+                    style={{ color: 'var(--text3)' }}
                     title="Delete chat">
                     <Trash2 size={12} />
                   </button>
@@ -184,53 +189,54 @@ export default function ChatsPage() {
           )}
         </div>
 
-        <div className="p-3 border-t border-white/8">
-          <button onClick={loadChats} className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-white text-xs py-2 transition-colors">
+        <div className="p-3" style={{ borderTop: '0.5px solid var(--border)' }}>
+          <button onClick={loadChats} className="w-full flex items-center justify-center gap-2 text-xs py-2 transition-colors"
+            style={{ color: 'var(--text3)' }}>
             <RefreshCw size={12} /> Refresh
           </button>
         </div>
       </div>
 
       {/* Chat window */}
-      <div className={`${active ? 'flex' : 'hidden md:flex'} flex-col flex-1 bg-[#0d1117] min-w-0`}>
+      <div className={`${active ? 'flex' : 'hidden md:flex'} flex-col flex-1 min-w-0`}
+        style={{ background: 'var(--bg)' }}>
         {!active ? (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <MessageCircle size={48} className="text-gray-700 mx-auto mb-4" />
-              <p className="text-gray-600">Koi chat select karein</p>
+              <MessageCircle size={48} className="mx-auto mb-4" style={{ color: 'var(--text3)' }} />
+              <p style={{ color: 'var(--text3)' }}>Koi chat select karein</p>
             </div>
           </div>
         ) : (
           <>
             {/* Chat header */}
-            <div className="h-14 bg-[#111] border-b border-white/8 flex items-center px-4 gap-3">
-              <button onClick={() => setActive(null)} className="md:hidden text-gray-400 hover:text-white mr-1">←</button>
-              <div className="w-8 h-8 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] font-bold text-sm">
+            <div className="h-14 flex items-center px-4 gap-3" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
+              <button onClick={() => setActive(null)} className="md:hidden mr-1" style={{ color: 'var(--text2)' }}>←</button>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
                 {active.customer_name?.charAt(0)?.toUpperCase() || active.customer_phone.slice(-2)}
               </div>
               <div>
-                <p className="text-white text-sm font-medium">{active.customer_name || active.customer_phone}</p>
-                <p className="text-gray-500 text-xs">{active.customer_phone}</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{active.customer_name || active.customer_phone}</p>
+                <p className="text-xs" style={{ color: 'var(--text3)' }}>{active.customer_phone}</p>
               </div>
             </div>
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
-                <div className="text-center py-8 text-gray-600 text-sm">Koi message nahi abhi</div>
+                <div className="text-center py-8 text-sm" style={{ color: 'var(--text3)' }}>Koi message nahi abhi</div>
               ) : (
                 messages.map(msg => (
-                  <div key={msg.id} className={`flex ${msg.from_customer ? 'justify-start' : 'justify-end'}`}>
+                  <div key={msg.id} className={`flex ${msg.from_customer ? 'justify-start' : 'justify-end'} animate-fade-in`}>
                     <div className={`max-w-[75%] ${msg.from_customer ? 'wa-bubble-in' : 'wa-bubble-out'} px-3 py-2`}>
-                      <p className={`text-sm ${msg.from_customer ? 'text-gray-100' : 'text-green-50'}`}>
-                        {msg.content}
-                      </p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <span className="text-xs opacity-50">
+                      <p className="text-sm" style={{ color: 'var(--text)' }}>{msg.content}</p>
+                      <div className={`flex items-center gap-1 mt-1 ${msg.from_customer ? '' : 'justify-end'}`}>
+                        <span className="text-xs" style={{ opacity: 0.5, color: 'var(--text)' }}>
                           {new Date(msg.created_at).toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                         {msg.ai_generated && (
-                          <span className="text-xs opacity-50 flex items-center gap-0.5">
+                          <span className="text-xs flex items-center gap-0.5" style={{ opacity: 0.5, color: 'var(--green)' }}>
                             <Bot size={10} /> AI
                           </span>
                         )}
@@ -244,23 +250,23 @@ export default function ChatsPage() {
 
             {/* AI suggestion */}
             {aiSuggestion && (
-              <div className="mx-4 mb-2 bg-[#25D366]/10 border border-[#25D366]/20 rounded-xl p-3">
+              <div className="mx-4 mb-2 rounded-xl p-3 animate-fade-in" style={{ background: 'var(--green-dim)', border: '0.5px solid rgba(61,186,94,0.2)' }}>
                 <div className="flex items-center gap-1 mb-1">
-                  <Bot size={12} className="text-[#25D366]" />
-                  <span className="text-[#25D366] text-xs font-medium">AI Suggestion</span>
+                  <Bot size={12} style={{ color: 'var(--green)' }} />
+                  <span className="text-xs font-medium" style={{ color: 'var(--green)' }}>AI Suggestion</span>
                 </div>
-                <p className="text-gray-300 text-sm mb-2">{aiSuggestion}</p>
+                <p className="text-sm mb-2" style={{ color: 'var(--text)' }}>{aiSuggestion}</p>
                 <div className="flex gap-2">
                   <button onClick={() => sendReply(aiSuggestion)}
-                    className="text-xs bg-[#25D366] text-white px-3 py-1.5 rounded-lg hover:bg-[#1da855] transition-colors">
+                    className="btn-primary text-xs" style={{ padding: '6px 14px' }}>
                     Send
                   </button>
                   <button onClick={() => { setReplyText(aiSuggestion); setAiSuggestion(''); }}
-                    className="text-xs border border-white/20 text-gray-300 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors">
+                    className="btn-ghost text-xs" style={{ padding: '6px 14px' }}>
                     Edit
                   </button>
                   <button onClick={() => setAiSuggestion('')}
-                    className="text-xs text-gray-600 hover:text-gray-400 px-2">
+                    className="text-xs px-2 transition-colors" style={{ color: 'var(--text3)' }}>
                     ✕
                   </button>
                 </div>
@@ -268,15 +274,16 @@ export default function ChatsPage() {
             )}
 
             {/* Reply input */}
-            <div className="p-4 bg-[#111] border-t border-white/8">
+            <div className="p-4" style={{ background: 'var(--bg2)', borderTop: '0.5px solid var(--border)' }}>
               <div className="flex gap-2">
                 <input value={replyText} onChange={e => setReplyText(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendReply()}
                   placeholder="Message likhein..."
-                  className="flex-1 bg-[#1a1a1a] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#25D366] transition-colors" />
+                  className="field flex-1" />
                 <button onClick={() => sendReply()} disabled={sending || !replyText.trim()}
-                  className="w-10 h-10 bg-[#25D366] hover:bg-[#1da855] disabled:opacity-40 rounded-xl flex items-center justify-center transition-colors shrink-0">
-                  <Send size={16} className="text-white" />
+                  className="w-10 h-10 rounded-xl flex items-center justify-center transition-colors shrink-0"
+                  style={{ background: 'var(--green)', color: '#fff', opacity: sending || !replyText.trim() ? 0.4 : 1 }}>
+                  <Send size={16} />
                 </button>
               </div>
             </div>

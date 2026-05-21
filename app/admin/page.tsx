@@ -16,49 +16,52 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-4 md:p-6 max-w-5xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Shield size={20} className="text-[#25D366]" />
-        <h1 className="text-xl font-bold">Admin Panel</h1>
+        <Shield size={20} style={{ color: 'var(--green)' }} />
+        <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>Admin Panel</h1>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-[#111] border border-white/8 rounded-2xl p-5">
-          <p className="text-2xl font-bold text-white">{users.length}</p>
-          <p className="text-gray-500 text-xs mt-1">Total Users</p>
+        <div className="card p-5">
+          <p className="text-2xl font-bold" style={{ color: 'var(--text)' }}>{users.length}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Total Users</p>
         </div>
-        <div className="bg-[#111] border border-white/8 rounded-2xl p-5">
-          <p className="text-2xl font-bold text-[#25D366]">{users.filter(u=>u.wa_connected).length}</p>
-          <p className="text-gray-500 text-xs mt-1">WA Connected</p>
+        <div className="card p-5">
+          <p className="text-2xl font-bold" style={{ color: 'var(--green)' }}>{users.filter(u=>u.wa_connected).length}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>WA Connected</p>
         </div>
-        <div className="bg-[#111] border border-white/8 rounded-2xl p-5">
-          <p className="text-2xl font-bold text-purple-400">{users.filter(u=>u.plan!=='free').length}</p>
-          <p className="text-gray-500 text-xs mt-1">Paid Users</p>
+        <div className="card p-5">
+          <p className="text-2xl font-bold" style={{ color: '#a855f7' }}>{users.filter(u=>u.plan!=='free').length}</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Paid Users</p>
         </div>
       </div>
 
-      <div className="bg-[#111] border border-white/8 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-white/8 flex items-center gap-2">
-          <Users size={16} className="text-gray-400" />
-          <h2 className="font-semibold text-sm">All Users</h2>
+      <div className="card overflow-hidden">
+        <div className="p-4 flex items-center gap-2" style={{ borderBottom: '0.5px solid var(--border)' }}>
+          <Users size={16} style={{ color: 'var(--text3)' }} />
+          <h2 className="font-semibold text-sm" style={{ color: 'var(--text)' }}>All Users</h2>
         </div>
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading...</div>
+          <div className="p-8 text-center" style={{ color: 'var(--text3)' }}>Loading...</div>
         ) : (
-          <div className="divide-y divide-white/5">
-            {users.map(u => (
-              <div key={u.id} className="flex items-center gap-3 p-4">
-                <div className="w-9 h-9 rounded-full bg-[#25D366]/20 flex items-center justify-center text-[#25D366] font-bold text-sm shrink-0">
+          <div>
+            {users.map((u, i) => (
+              <div key={u.id} className="flex items-center gap-3 p-4 animate-fade-in"
+                style={{ animationDelay: `${i * 0.03}s`, borderBottom: '0.5px solid var(--border)' }}>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                  style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
                   {u.name?.charAt(0)?.toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-sm font-medium">{u.name}</p>
-                  <p className="text-gray-500 text-xs">{u.phone} · {new Date(u.created_at).toLocaleDateString()}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{u.name}</p>
+                  <p className="text-xs" style={{ color: 'var(--text3)' }}>{u.phone} · {new Date(u.created_at).toLocaleDateString()}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  {u.wa_connected ? <Wifi size={14} className="text-[#25D366]" /> : <WifiOff size={14} className="text-gray-600" />}
+                  {u.wa_connected ? <Wifi size={14} style={{ color: 'var(--green)' }} /> : <WifiOff size={14} style={{ color: 'var(--text3)' }} />}
                   <select value={u.plan} onChange={e => setPlan(u.id, e.target.value)}
-                    className="bg-[#1a1a1a] border border-white/10 rounded-lg px-2 py-1 text-xs text-white focus:outline-none focus:border-[#25D366]">
+                    className="field text-xs"
+                    style={{ width: 'auto', minWidth: '80px', padding: '6px 10px' }}>
                     <option value="free">Free</option>
                     <option value="basic">Basic</option>
                     <option value="pro">Pro</option>

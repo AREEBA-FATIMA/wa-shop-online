@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
-import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera, ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera } from 'lucide-react';
 
 interface Product {
   id: string; name: string; description: string; price: number;
@@ -67,20 +67,17 @@ export default function ProductsPage() {
 
   function upd(k: string, v: any) { setForm(f => ({ ...f, [k]: v })); }
 
-  // Gallery se image pick karo
   async function handleImagePick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { setErr('Sirf image files allowed hain'); return; }
     if (file.size > 5 * 1024 * 1024) { setErr('Image 5MB se bari nahi honi chahiye'); return; }
 
-    // Preview dikhao
     const reader = new FileReader();
     reader.onload = (ev) => setImgPreview(ev.target?.result as string);
     reader.readAsDataURL(file);
 
     if (editing) {
-      // Existing product — base64 JSON se upload karo (no multipart = no CORS issue)
       setImgUploading(true);
       try {
         const base64 = await new Promise<string>((resolve, reject) => {
@@ -98,14 +95,12 @@ export default function ProductsPage() {
       }
       setImgUploading(false);
     } else {
-      // New product — base64 form mein save karo, upload baad mein product create pe hoga
       const reader2 = new FileReader();
       reader2.onload = (ev) => {
         upd('image_url', ev.target?.result as string);
       };
       reader2.readAsDataURL(file);
     }
-    // Input reset karo taake same file dobara select ho sake
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
@@ -119,7 +114,7 @@ export default function ProductsPage() {
           <p className="text-sm" style={{ color: 'var(--text3)' }}>{products.length} products</p>
         </div>
         <button onClick={openAdd}
-          className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1da855] text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+          className="btn-primary text-sm" style={{ padding: '10px 20px' }}>
           <Plus size={15} /> Product Add Karein
         </button>
       </div>
@@ -127,31 +122,28 @@ export default function ProductsPage() {
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-40 rounded-2xl animate-pulse border"
-              style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }} />
+            <div key={i} className="h-48 rounded-2xl skeleton" />
           ))}
         </div>
       ) : products.length === 0 ? (
         <div className="text-center py-20">
           <Package size={48} className="mx-auto mb-4" style={{ color: 'var(--text3)' }} />
           <p className="mb-2" style={{ color: 'var(--text3)' }}>Koi product nahi</p>
-          <button onClick={openAdd} className="text-[#25D366] text-sm hover:underline">
+          <button onClick={openAdd} className="text-sm hover:underline font-medium" style={{ color: 'var(--green)' }}>
             Pehla product add karein
           </button>
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map(p => (
-            <div key={p.id} className="rounded-2xl border overflow-hidden hover:opacity-90 transition-all"
-              style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}>
-              {/* Product image */}
+          {products.map((p, i) => (
+            <div key={p.id} className="card overflow-hidden group animate-fade-in-up"
+              style={{ animationDelay: `${i * 0.05}s` }}>
               {p.image_url ? (
                 <img src={p.image_url} alt={p.name}
-                  className="w-full h-40 object-cover" />
+                  className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
-                <div className="w-full h-20 flex items-center justify-center"
-                  style={{ background: 'var(--bg3)' }}>
-                  <ImageIcon size={24} style={{ color: 'var(--text3)' }} />
+                <div className="w-full h-20 flex items-center justify-center" style={{ background: 'var(--bg3)' }}>
+                  <Package size={24} style={{ color: 'var(--text3)' }} />
                 </div>
               )}
               <div className="p-4">
@@ -164,7 +156,8 @@ export default function ProductsPage() {
                       <Edit2 size={13} />
                     </button>
                     <button onClick={() => del(p.id)}
-                      className="p-1.5 rounded-lg transition-all text-red-400 hover:opacity-70">
+                      className="p-1.5 rounded-lg transition-all hover:opacity-70"
+                      style={{ color: '#e05a5a' }}>
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -186,24 +179,21 @@ export default function ProductsPage() {
                   </div>
                   <div className="flex justify-between text-xs">
                     <span style={{ color: 'var(--text3)' }}>Floor (min)</span>
-                    <span className="text-amber-400">Rs.{p.floor_price}</span>
+                    <span style={{ color: '#e8a030' }}>Rs.{p.floor_price}</span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span style={{ color: 'var(--text3)' }}>Stock</span>
-                    <span className={p.stock <= 3 ? 'text-red-400' : ''} style={p.stock > 3 ? { color: 'var(--text)' } : {}}>
+                    <span className={p.stock <= 3 ? '' : ''}
+                      style={p.stock <= 3 ? { color: '#e05a5a' } : { color: 'var(--text)' }}>
                       {p.stock} baqi
                     </span>
                   </div>
                 </div>
                 <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${p.include_in_status ? 'bg-[#25D366]/15 text-[#25D366]' : 'bg-gray-500/15 text-gray-500'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium`}
+                    style={p.include_in_status ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'var(--bg3)', color: 'var(--text3)' }}>
                     {p.include_in_status ? '📡 Status mein' : 'Status se bahir'}
                   </span>
-                  {p.image_url && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400">
-                      📷 Image
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
@@ -213,24 +203,26 @@ export default function ProductsPage() {
 
       {/* Modal */}
       {modal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="rounded-2xl w-full max-w-md max-h-[92vh] overflow-y-auto border"
-            style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between p-5 border-b sticky top-0"
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setModal(false)}>
+          <div className="rounded-2xl w-full max-w-md max-h-[92vh] overflow-y-auto card-elevated animate-scale-in"
+            style={{ background: 'var(--bg)' }}
+            onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b sticky top-0 z-10"
               style={{ background: 'var(--bg)', borderColor: 'var(--border)' }}>
               <h2 className="font-bold" style={{ color: 'var(--text)' }}>
                 {editing ? 'Product Edit' : 'Naya Product'}
               </h2>
-              <button onClick={() => setModal(false)}>
-                <X size={18} style={{ color: 'var(--text3)' }} className="hover:opacity-70" />
+              <button onClick={() => setModal(false)} className="p-1 rounded-lg hover:opacity-70 transition-opacity"
+                style={{ color: 'var(--text3)' }}>
+                <X size={18} />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
-
               {/* Image upload */}
               <div>
-                <label className="text-xs mb-2 block" style={{ color: 'var(--text3)' }}>
+                <label className="text-xs mb-2 block font-medium" style={{ color: 'var(--text3)' }}>
                   Product Image (gallery se)
                 </label>
                 <input
@@ -258,11 +250,11 @@ export default function ProductsPage() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 hover:opacity-80 transition-all"
+                    className="w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-all hover:opacity-70"
                     style={{ borderColor: 'var(--border)', color: 'var(--text3)' }}>
                     <Camera size={22} />
                     <span className="text-xs">Gallery se image add karein</span>
-                    <span className="text-xs opacity-60">JPG, PNG, WebP — max 5MB</span>
+                    <span className="text-xs" style={{ opacity: 0.6 }}>JPG, PNG, WebP — max 5MB</span>
                   </button>
                 )}
               </div>
@@ -278,7 +270,7 @@ export default function ProductsPage() {
                 { label: 'Category', key: 'category', type: 'text', placeholder: 'Clothes, Electronics...' },
               ].map(f => (
                 <div key={f.key}>
-                  <label className="text-xs mb-1 block" style={{ color: 'var(--text3)' }}>{f.label}</label>
+                  <label className="text-xs mb-1 block font-medium" style={{ color: 'var(--text3)' }}>{f.label}</label>
                   <input
                     type={f.type}
                     value={(form as any)[f.key] ?? ''}
@@ -286,8 +278,7 @@ export default function ProductsPage() {
                       ? (e.target.value ? parseFloat(e.target.value) : null)
                       : e.target.value)}
                     placeholder={f.placeholder}
-                    className="w-full rounded-xl px-3 py-2.5 text-sm border focus:outline-none focus:border-[#25D366] transition-colors"
-                    style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }}
+                    className="field"
                   />
                   {f.key === 'floor_price' && (
                     <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>
@@ -305,16 +296,17 @@ export default function ProductsPage() {
               {/* Status toggle */}
               <div className="flex items-center gap-3">
                 <div onClick={() => upd('include_in_status', !form.include_in_status)}
-                  className={`w-10 h-5 rounded-full transition-colors flex items-center px-0.5 cursor-pointer shrink-0 ${form.include_in_status ? 'bg-[#25D366]' : 'bg-gray-600'}`}>
-                  <div className={`w-4 h-4 bg-white rounded-full transition-transform ${form.include_in_status ? 'translate-x-5' : 'translate-x-0'}`} />
+                  className={`toggle ${form.include_in_status ? 'on' : 'off'}`}>
+                  <div className="knob" />
                 </div>
                 <span className="text-sm" style={{ color: 'var(--text)' }}>Daily Status mein include karo</span>
               </div>
 
-              {err && <p className="text-red-400 text-sm">{err}</p>}
+              {err && <p className="text-sm" style={{ color: '#e05a5a' }}>{err}</p>}
 
               <button onClick={save} disabled={saving || imgUploading}
-                className="w-full bg-[#25D366] hover:bg-[#1da855] disabled:opacity-50 text-white py-3 rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
+                className="btn-primary w-full justify-center"
+                style={{ opacity: saving || imgUploading ? 0.6 : 1 }}>
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                 {editing ? 'Update Karein' : 'Add Karein'}
               </button>
