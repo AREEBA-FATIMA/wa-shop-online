@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X } from 'lucide-react';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown } from 'lucide-react';
 import { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -13,15 +13,16 @@ const NAV = [
   { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
   { href: '/dashboard/status', icon: Radio, label: 'Status' },
   { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/dashboard/subscription', icon: Crown, label: 'Subscription' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
 const BOTTOM_NAV = [
   { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats' },
+  { href: '/dashboard/status', icon: Radio, label: 'Status' },
   { href: '/dashboard/products', icon: Package, label: 'Products' },
   { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
-  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
+  { href: '/dashboard/subscription', icon: Crown, label: 'Subscribe' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

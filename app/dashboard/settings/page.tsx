@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Loader2, Check, Wifi, WifiOff, Crown, Clock, User, Globe, Bot, ShieldCheck, ChevronRight, Smartphone, LogOut } from 'lucide-react';
+import { Loader2, Check, Wifi, WifiOff, Crown, Clock, User, Globe, Bot, ShieldCheck, ChevronRight, Smartphone, LogOut, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserData { id: string; name: string; phone: string; plan: string; language: string; wa_connected: boolean; ai_auto_reply: boolean; trial_ends?: string; }
@@ -166,7 +166,9 @@ export default function SettingsPage() {
             <p>✅ Images in WhatsApp status</p>
             <p>✅ Unlimited status posts</p>
             <p>✅ Advanced analytics</p>
-            <p className="mt-2" style={{ color: '#60a5fa' }}>Contact admin to upgrade</p>
+            <Link href="/dashboard/subscription" className="mt-3 btn-primary w-full justify-center text-xs flex items-center gap-1.5">
+              <Crown size={12} />Upgrade Now
+            </Link>
           </div>
         )}
       </div>
