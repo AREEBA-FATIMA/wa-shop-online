@@ -50,10 +50,12 @@ export default function StatusPage() {
     if (!userId) return;
     setSending(true); setMsg('');
     try {
-      const payload: any = { user_id: String(userId), text: preview };
-      if (imageMode && firstImage) payload.image_url = firstImage;
-      const r = await api.post('/api/wa/status-post', payload);
-      setMsg(r.data.success ? '✅ Status posted!' : '❌ Error: ' + (r.data.error || 'Unknown'));
+      const r = await api.post('/api/wa/status-post', { product_ids: selected });
+      const results = r.data.results || [];
+      const succeeded = results.filter((res: any) => res.success).length;
+      const failed = results.filter((res: any) => !res.success).length;
+      if (failed === 0) setMsg(`✅ ${succeeded} statuses posted!`);
+      else setMsg(`⚠️ ${succeeded} posted, ${failed} failed`);
     } catch (e: any) { setMsg('❌ Error: ' + (e?.response?.data?.detail || e?.message || 'Connection error')); }
     setSending(false);
   }
