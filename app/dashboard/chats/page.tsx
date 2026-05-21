@@ -124,7 +124,7 @@ export default function ChatsPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-0px)] md:h-screen overflow-hidden">
+    <div className="flex h-[calc(100vh-56px-60px)] md:h-screen overflow-hidden">
       {/* Chat list */}
       <div className={`${active ? 'hidden md:flex' : 'flex'} flex-col w-full md:w-80 shrink-0 border-r`}
         style={{ background: 'var(--bg2)', borderColor: 'var(--border)' }}>

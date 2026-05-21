@@ -68,7 +68,7 @@ export default function Register() {
               <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />Password</label>
             </div>
             <div className="floating-label">
-              <select value={form.language} onChange={e=>update('language',e.target.value)} className="field">
+              <select value={form.language} onChange={e=>update('language',e.target.value)} className="field" required>
                 <option value="roman_ur">Roman Urdu</option>
                 <option value="urdu">اردو (Urdu)</option>
                 <option value="en">English</option>

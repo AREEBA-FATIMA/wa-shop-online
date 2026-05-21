@@ -88,7 +88,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   function logout() { removeToken(); router.push('/'); }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+    <div className="min-h-screen flex" style={{ background: 'var(--bg)' }}>
       {/* ─── Desktop Sidebar ─── */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
@@ -193,18 +193,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* ─── Bottom Tab Nav (Mobile Only) ─── */}
       <div className="bottom-nav md:hidden">
-        <div className="bottom-nav-inner">
-          {BOTTOM_NAV.map(n => {
-            const active = path === n.href || (n.href !== '/dashboard' && path.startsWith(n.href));
-            return (
-              <Link key={n.href} href={n.href}
-                className={`bottom-nav-item ${active ? 'active' : ''}`}>
-                <n.icon size={20} strokeWidth={active ? 2.5 : 1.8} />
-                <span>{n.label}</span>
-              </Link>
-            );
-          })}
-        </div>
+        {BOTTOM_NAV.map(n => {
+          const active = path === n.href || (n.href !== '/dashboard' && path.startsWith(n.href));
+          return (
+            <Link key={n.href} href={n.href}
+              className={active ? 'active' : ''}>
+              <n.icon size={20} strokeWidth={active ? 2.5 : 1.8} />
+              <span>{n.label}</span>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

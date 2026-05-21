@@ -189,7 +189,8 @@ h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
 .floating-label {
   position: relative;
 }
-.floating-label input {
+.floating-label input,
+.floating-label select {
   padding-top: 20px;
   padding-bottom: 8px;
 }
@@ -203,7 +204,9 @@ h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
   transition: all 0.2s ease;
 }
 .floating-label input:focus + label,
-.floating-label input:not(:placeholder-shown) + label {
+.floating-label input:not(:placeholder-shown) + label,
+.floating-label select:focus + label,
+.floating-label select:valid + label {
   top: 6px;
   font-size: 10px;
   color: var(--green);

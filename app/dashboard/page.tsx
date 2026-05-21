@@ -23,7 +23,7 @@ export default function DashboardHome() {
   ] : [];
 
   const quickLinks = [
-    { href: '/dashboard/chats', icon: MessageCircle, title: 'Chats', desc: 'Messages aur AI auto-replies', color: 'var(--green)' },
+    { href: '/dashboard/chats', icon: MessageCircle, title: 'Chats', desc: 'Messages aur AI auto-replies', color: '#25D366' },
     { href: '/dashboard/products', icon: Package, title: 'Products', desc: 'Manage inventory & prices', color: '#22d3ee' },
     { href: '/dashboard/orders', icon: ShoppingBag, title: 'Orders', desc: 'Pending & completed orders', color: '#a855f7' },
   ];

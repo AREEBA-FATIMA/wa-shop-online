@@ -182,7 +182,7 @@ export default function Landing() {
         <div className="py-12" style={{ borderTop: '0.5px solid var(--border)', borderBottom: '0.5px solid var(--border)' }}>
           <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','More Sales']].map(([v,l], i) => (
-              <div key={l} className="animate-fade-in-up stagger-{i+1}">
+              <div key={l} className="animate-fade-in-up">
                 <p className="brand font-extrabold text-4xl gradient-text-green">{v}</p>
                 <p className="text-xs mt-1 font-medium" style={{ color: 'var(--text3)' }}>{l}</p>
               </div>

@@ -28,7 +28,7 @@ export default function AdminPage() {
           <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Total Users</p>
         </div>
         <div className="card p-5">
-            <p className="text-2xl font-bold gradient-text-green">{users.filter(u=>u.wa_connected).length}</p>
+          <p className="text-2xl font-bold gradient-text-green">{users.filter(u=>u.wa_connected).length}</p>
           <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>WA Connected</p>
         </div>
         <div className="card p-5">
