@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Loader2, Check, Wifi, WifiOff, Crown, Clock, User, Globe, Bot, ShieldCheck, ChevronRight, Smartphone, LogOut, ExternalLink, Monitor, Trash2, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Check, CheckCircle, Wifi, WifiOff, Crown, Clock, User, Globe, Bot, ShieldCheck, ChevronRight, Smartphone, LogOut, ExternalLink, Monitor, Trash2, KeyRound, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserData { id: string; name: string; phone: string; plan: string; language: string; wa_connected: boolean; ai_auto_reply: boolean; trial_ends?: string; }
@@ -231,10 +231,10 @@ export default function SettingsPage() {
         {!isPremium && (
           <div className="p-3 rounded-xl text-xs space-y-1" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>
             <p className="font-semibold mb-2" style={{ color: '#facc15' }}>Premium features:</p>
-            <p>✅ Unlimited AI auto-replies</p>
-            <p>✅ Images in WhatsApp status</p>
-            <p>✅ Unlimited status posts</p>
-            <p>✅ Advanced analytics</p>
+            <p><CheckCircle size={12} className="inline mr-1" /> Unlimited AI auto-replies</p>
+            <p><CheckCircle size={12} className="inline mr-1" /> Images in WhatsApp status</p>
+            <p><CheckCircle size={12} className="inline mr-1" /> Unlimited status posts</p>
+            <p><CheckCircle size={12} className="inline mr-1" /> Advanced analytics</p>
             <Link href="/dashboard/subscription" className="mt-3 btn-primary w-full justify-center text-xs flex items-center gap-1.5">
               <Crown size={12} />Upgrade Now
             </Link>
@@ -250,7 +250,7 @@ export default function SettingsPage() {
         <div className="p-3 rounded-xl mb-3" style={{ background: 'var(--bg3)' }}>
           <p className="text-xs mb-2" style={{ color: 'var(--text3)' }}>
             {hasPassphrase
-              ? '✅ Passphrase set hai — messages double encryption se store hote hain. Server key + aapka passphrase dono chahiye decrypt karne ke liye.'
+              ? <><CheckCircle size={12} className="inline mr-1" /> Passphrase set hai — messages double encryption se store hote hain. Server key + aapka passphrase dono chahiye decrypt karne ke liye.</>
               : 'Passphrase set karein taake koi server access kare to bhi aapke messages nahi padh sakta. Ye aapke password se alag hai.'}
           </p>
           {!hasPassphrase ? (

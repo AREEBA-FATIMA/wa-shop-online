@@ -165,9 +165,9 @@ export default function Landing() {
               </div>
               <div className="p-4 space-y-2.5" style={{ background: 'var(--bg3)' }}>
                 <div className="wa-bubble-in p-2.5 max-w-[80%] text-xs" style={{ color: 'var(--text2)' }}>Yeh shirt available hai?</div>
-                <div className="wa-bubble-out p-2.5 max-w-[80%] ml-auto text-xs">Ji! White cotton Rs.950 mein, 3 pieces baqi 🛍️</div>
-                <div className="wa-bubble-in p-2.5 max-w-[80%] text-xs" style={{ color: 'var(--text2)' }}>800 mein dein ge? 🙏</div>
-                <div className="wa-bubble-out p-2.5 max-w-[80%] ml-auto text-xs">Aapke liye Rs.900 final! Confirm? 😊</div>
+                <div className="wa-bubble-out p-2.5 max-w-[80%] ml-auto text-xs">Ji! White cotton Rs.950 mein, 3 pieces baqi</div>
+                <div className="wa-bubble-in p-2.5 max-w-[80%] text-xs" style={{ color: 'var(--text2)' }}>800 mein dein ge?</div>
+                <div className="wa-bubble-out p-2.5 max-w-[80%] ml-auto text-xs">Aapke liye Rs.900 final! Confirm?</div>
               </div>
               <div className="px-4 py-2.5 flex items-center gap-2" style={{ background: 'var(--bg2)', borderTop: '0.5px solid var(--border)' }}>
                 <div className="flex-1 py-1.5 px-3 text-xs rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>Message</div>

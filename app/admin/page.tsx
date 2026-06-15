@@ -228,7 +228,7 @@ export default function AdminPage() {
                         background: p.status === 'approved' ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
                         color: p.status === 'approved' ? 'var(--green)' : '#e05a5a'
                       }}>
-                        {p.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                        {p.status === 'approved' ? <><CheckCircle size={12} className="inline mr-1" />Approved</> : <><XCircle size={12} className="inline mr-1" />Rejected</>}
                       </span>
                     )}
                   </div>

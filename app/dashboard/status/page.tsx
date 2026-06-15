@@ -31,16 +31,16 @@ export default function StatusPage() {
       const results = r.data.results || [];
       const succeeded = results.filter((res: any) => res.success).length;
       const failed = results.filter((res: any) => !res.success).length;
-      if (failed === 0) setMsg(`✅ ${succeeded} statuses posted!`);
-      else setMsg(`⚠️ ${succeeded} posted, ${failed} failed`);
-    } catch (e: any) { setMsg('❌ Error: ' + (e?.response?.data?.detail || e?.message || 'Connection error')); }
+      if (failed === 0) setMsg(`${succeeded} statuses posted!`);
+      else setMsg(`${succeeded} posted, ${failed} failed`);
+    } catch (e: any) { setMsg('Error: ' + (e?.response?.data?.detail || e?.message || 'Connection error')); }
     setSending(false);
   }
 
   async function saveSchedule() {
     if (!userId) return;
     setSending(true); setMsg('');
-    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days }); setMsg('✅ Schedule saved!'); } catch { setMsg('❌ Schedule failed'); }
+    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days }); setMsg('Schedule saved!'); } catch { setMsg('Schedule failed'); }
     setSending(false);
   }
 
@@ -104,7 +104,7 @@ export default function StatusPage() {
         </div>
 
         {msg && (
-          <p className="text-sm text-center py-2.5 px-4 rounded-xl" style={msg.startsWith('✅') ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'rgba(220,50,50,0.08)', color: '#e05a5a' }}>
+          <p className="text-sm text-center py-2.5 px-4 rounded-xl" style={msg.includes('failed') || msg.includes('Error') ? { background: 'rgba(220,50,50,0.08)', color: '#e05a5a' } : { background: 'var(--green-dim)', color: 'var(--green)' }}>
             {msg}
           </p>
         )}

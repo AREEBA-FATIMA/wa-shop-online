@@ -1,9 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Crown, Check, Loader2, Clock, CreditCard, ChevronRight, Copy, Smartphone, Building2 } from 'lucide-react';
+import { Crown, Check, Loader2, Clock, CreditCard, ChevronRight, Copy, Smartphone, Building2, Medal, ClipboardList } from 'lucide-react';
 
-const PLAN_ICONS: Record<string, string> = { basic: '🥉', pro: '👑' };
+const PLAN_ICONS: Record<string, React.ReactNode> = { basic: <Medal size={24} />, pro: <Crown size={24} /> };
 
 export default function SubscriptionPage() {
   const [plans, setPlans] = useState<Record<string, any>>({});
@@ -30,9 +30,9 @@ export default function SubscriptionPage() {
       const r = await api.post('/api/subscription/create-order', { plan });
       if (r.data.success) {
         setOrders(prev => [r.data.payment, ...prev]);
-        setMsg(`✅ Order create ho gaya! Neeche diye gaye payment details se pay karein. Admin approve kare ga.`);
+        setMsg('Order create ho gaya! Neeche diye gaye payment details se pay karein. Admin approve kare ga.');
       }
-    } catch (e: any) { setMsg('❌ Error: ' + (e?.response?.data?.detail || e?.message)); }
+    } catch (e: any) { setMsg('Error: ' + (e?.response?.data?.detail || e?.message)); }
     setBuying(false);
   }
 
@@ -65,7 +65,9 @@ export default function SubscriptionPage() {
               <div key={key} className={`rounded-2xl p-5 transition-all ${isActive ? 'ring-2' : ''}`}
                 style={{ background: 'var(--bg2)', border: isActive ? '2px solid var(--green)' : '0.5px solid var(--border)' }}>
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-2xl">{PLAN_ICONS[key] || '📋'}</span>
+                  <span className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: key === 'pro' ? 'rgba(250,204,21,0.12)' : 'var(--bg3)' }}>
+                    {PLAN_ICONS[key] || <ClipboardList size={24} />}
+                  </span>
                   <div>
                     <h3 className="font-bold text-lg" style={{ color: 'var(--text)' }}>{plan.name}</h3>
                     {isActive && <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>Current Plan</span>}
@@ -96,7 +98,7 @@ export default function SubscriptionPage() {
       )}
 
       {msg && (
-        <p className="text-sm text-center py-3 px-4 rounded-xl" style={msg.startsWith('✅') ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'rgba(220,50,50,0.08)', color: '#e05a5a' }}>
+        <p className="text-sm text-center py-3 px-4 rounded-xl" style={msg.startsWith('Error') ? { background: 'rgba(220,50,50,0.08)', color: '#e05a5a' } : { background: 'var(--green-dim)', color: 'var(--green)' }}>
           {msg}
         </p>
       )}

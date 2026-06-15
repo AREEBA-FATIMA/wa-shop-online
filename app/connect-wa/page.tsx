@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageCircle, CheckCircle2, XCircle, RefreshCw, Smartphone, QrCode, Loader2, Copy, ArrowLeft } from 'lucide-react';
+import { MessageCircle, CheckCircle2, XCircle, RefreshCw, Smartphone, QrCode, Loader2, Copy, ArrowLeft, Lock, Shield, AlertTriangle } from 'lucide-react';
 
 type ConnectStatus = 'idle' | 'loading' | 'qr' | 'authenticated' | 'ready' | 'error';
 
@@ -251,7 +251,7 @@ export default function ConnectWA() {
                   style={{ background: 'var(--green-dim)' }}>
                   <CheckCircle2 size={40} style={{ color: 'var(--green)' }} />
                 </div>
-                <p className="font-bold text-lg" style={{ color: 'var(--text)' }}>Connected! ✅</p>
+                <p className="font-bold text-lg flex items-center justify-center gap-2" style={{ color: 'var(--text)' }}><CheckCircle2 size={20} style={{ color: 'var(--green)' }} />Connected!</p>
                 <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>Dashboard par ja raha hai...</p>
                 {/* Progress bar */}
                 <div className="w-full h-1 rounded-full mt-4 overflow-hidden" style={{ background: 'var(--bg3)' }}>
@@ -331,7 +331,7 @@ export default function ConnectWA() {
                     </label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium"
-                        style={{ color: 'var(--text3)' }}>🇵🇰 +92</div>
+                        style={{ color: 'var(--text3)' }}>+92</div>
                       <input
                         type="tel"
                         value={phone.replace('92', '')}
@@ -430,10 +430,10 @@ export default function ConnectWA() {
           <div className="mt-6 p-3 rounded-xl text-left text-xs space-y-1.5 animate-fade-in"
             style={{ background: 'rgba(250,204,21,0.08)', color: 'var(--text3)' }}>
             <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: '#facc15' }}>Security Info</p>
-            <p>🔒 Aapka WhatsApp session encrypted hai — koi aur is system se aapka WhatsApp access nahi kar sakta</p>
-            <p>📱 Kabhi bhi apne phone se WhatsApp → Linked Devices ja kar session remove kar sakte hain</p>
-            <p>🛡️ Messages end-to-end encrypted store hote hain — sirf aap aur customer dekh sakte hain</p>
-            <p>⚠️ Kisi aur ko apna QR ya pairing code share na karein</p>
+            <p><Lock size={12} className="inline mr-1" /> Aapka WhatsApp session encrypted hai — koi aur is system se aapka WhatsApp access nahi kar sakta</p>
+            <p><Smartphone size={12} className="inline mr-1" /> Kabhi bhi apne phone se WhatsApp → Linked Devices ja kar session remove kar sakte hain</p>
+            <p><Shield size={12} className="inline mr-1" /> Messages end-to-end encrypted store hote hain — sirf aap aur customer dekh sakte hain</p>
+            <p><AlertTriangle size={12} className="inline mr-1" /> Kisi aur ko apna QR ya pairing code share na karein</p>
           </div>
         </div>
       </div>
