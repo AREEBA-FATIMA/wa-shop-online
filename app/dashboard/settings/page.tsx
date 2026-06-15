@@ -103,6 +103,7 @@ export default function SettingsPage() {
       const u = JSON.parse(localStorage.getItem('wa_user') || '{}');
       localStorage.setItem('wa_user', JSON.stringify({ ...u, name: form.name, language: form.language }));
       setUserData(prev => prev ? { ...prev, ...form } : prev);
+      window.dispatchEvent(new Event('langchange'));
       setSaved(true); setTimeout(() => setSaved(false), 2500);
     } catch {}
     setSaving(false);

@@ -5,37 +5,39 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell } from 'lucide-react';
 import api, { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
+import { LangProvider, useT } from '@/contexts/LangContext';
 
-const NAV = [
-  { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats' },
-  { href: '/dashboard/products', icon: Package, label: 'Products' },
-  { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
-  { href: '/dashboard/status', icon: Radio, label: 'Status' },
-  { href: '/dashboard/analytics', icon: BarChart3, label: 'Analytics' },
-  { href: '/dashboard/subscription', icon: Crown, label: 'Subscription' },
-  { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
-];
-
-const BOTTOM_NAV = [
-  { href: '/dashboard', icon: Home, label: 'Home' },
-  { href: '/dashboard/status', icon: Radio, label: 'Status' },
-  { href: '/dashboard/products', icon: Package, label: 'Products' },
-  { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
-  { href: '/dashboard/subscription', icon: Crown, label: 'Subscribe' },
-];
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
+  const { t } = useT();
   const [user, setUser] = useState<any>(null);
   const [waConnected, setWaConnected] = useState(false);
   const [waLoading, setWaLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [waAlert, setWaAlert] = useState(false);
-  const [logoutTimer, setLogoutTimer] = useState(30 * 60); // 30 min in seconds
+  const [logoutTimer, setLogoutTimer] = useState(30 * 60);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const activityRef = useRef(0);
+
+  const NAV = [
+    { href: '/dashboard', icon: Home, label: t('nav_home') },
+    { href: '/dashboard/chats', icon: MessageCircle, label: t('nav_chats') },
+    { href: '/dashboard/products', icon: Package, label: t('nav_products') },
+    { href: '/dashboard/orders', icon: ShoppingBag, label: t('nav_orders') },
+    { href: '/dashboard/status', icon: Radio, label: t('nav_status') },
+    { href: '/dashboard/analytics', icon: BarChart3, label: t('nav_analytics') },
+    { href: '/dashboard/subscription', icon: Crown, label: t('nav_subscription') },
+    { href: '/dashboard/settings', icon: Settings, label: t('nav_settings') },
+  ];
+
+  const BOTTOM_NAV = [
+    { href: '/dashboard', icon: Home, label: t('nav_home') },
+    { href: '/dashboard/status', icon: Radio, label: t('nav_status') },
+    { href: '/dashboard/products', icon: Package, label: t('nav_products') },
+    { href: '/dashboard/orders', icon: ShoppingBag, label: t('nav_orders') },
+    { href: '/dashboard/subscription', icon: Crown, label: t('nav_subscribe') },
+  ];
 
   const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -128,7 +130,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </span>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{user?.name || 'User'}</p>
-            <p className="text-xs capitalize" style={{ color: 'var(--text3)' }}>{user?.plan || 'free'} plan</p>
+            <p className="text-xs capitalize" style={{ color: 'var(--text3)' }}>{user?.plan || 'free'}</p>
           </div>
           <div className="flex items-center gap-1.5">
             <Link href="/connect-wa" className="relative">
@@ -140,7 +142,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Nav */}
         <nav className="flex-1 px-3 pt-3 pb-2 space-y-0.5 overflow-y-auto">
-          <p className="text-[10px] font-semibold tracking-widest px-3 mb-2 uppercase" style={{ color: 'var(--text3)' }}>Menu</p>
+          <p className="text-[10px] font-semibold tracking-widest px-3 mb-2 uppercase" style={{ color: 'var(--text3)' }}>{t('nav_menu')}</p>
           {NAV.map(n => {
             const active = path === n.href;
             return (
@@ -166,16 +168,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               color: waConnected ? 'var(--green)' : '#e05a5a',
             }}>
             {waLoading ? (
-              <><RefreshCw size={14} className="animate-spin" />Reconnecting...</>
+              <><RefreshCw size={14} className="animate-spin" />{t('wa_reconnecting')}</>
             ) : waConnected ? (
-              <><span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)' }} /><Wifi size={14} />WhatsApp Connected</>
+              <><span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)' }} /><Wifi size={14} />{t('wa_connected')}</>
             ) : (
-              <><WifiOff size={14} />Connect WhatsApp</>
+              <><WifiOff size={14} />{t('wa_disconnected')}</>
             )}
             <ChevronRight size={14} className="ml-auto" />
           </Link>
           <button onClick={logout} className="flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-xs font-medium transition-all hover:opacity-70" style={{ color: '#e05a5a' }}>
-            <LogOut size={14} /> Logout
+            <LogOut size={14} /> {t('nav_logout')}
           </button>
         </div>
       </aside>
@@ -202,8 +204,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {waAlert && (
             <div className="flex items-center gap-3 px-4 py-2.5 text-sm animate-slide-down" style={{ background: 'var(--green-dim)', color: 'var(--green)', borderBottom: '0.5px solid var(--border)' }}>
               <Bell size={16} />
-              <span className="flex-1">New WhatsApp session connected — aapka session secure hai</span>
-              <button onClick={() => setWaAlert(false)} className="text-xs font-medium px-2.5 py-1 rounded-lg hover:opacity-70" style={{ background: 'var(--green)', color: '#fff' }}>OK</button>
+              <span className="flex-1">{t('wa_alert')}</span>
+              <button onClick={() => setWaAlert(false)} className="text-xs font-medium px-2.5 py-1 rounded-lg hover:opacity-70" style={{ background: 'var(--green)', color: '#fff' }}>{t('wa_alert_ok')}</button>
             </div>
           )}
           {children}
@@ -223,5 +225,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         })}
       </nav>
     </div>
+  );
+}
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <LangProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </LangProvider>
   );
 }
