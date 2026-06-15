@@ -1,9 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown } from 'lucide-react';
-import { removeToken } from '@/lib/api';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell } from 'lucide-react';
+import api, { removeToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const NAV = [
@@ -32,8 +32,38 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [waConnected, setWaConnected] = useState(false);
   const [waLoading, setWaLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [waAlert, setWaAlert] = useState(false);
+  const [logoutTimer, setLogoutTimer] = useState(30 * 60); // 30 min in seconds
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const activityRef = useRef(0);
 
   const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
+
+  // Reset logout timer on activity
+  const resetTimer = useCallback(() => {
+    activityRef.current = Date.now();
+    setLogoutTimer(30 * 60);
+  }, []);
+
+  // Auto-logout after 30 min of inactivity
+  useEffect(() => {
+    const events = ['mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
+    events.forEach(e => window.addEventListener(e, resetTimer));
+    resetTimer();
+    timerRef.current = setInterval(() => {
+      const elapsed = Math.round((Date.now() - activityRef.current) / 1000);
+      const remaining = Math.max(0, 30 * 60 - elapsed);
+      setLogoutTimer(remaining);
+      if (remaining <= 0) {
+        removeToken();
+        router.push('/auth/login');
+      }
+    }, 1000);
+    return () => {
+      events.forEach(e => window.removeEventListener(e, resetTimer));
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const u = localStorage.getItem('wa_user');
@@ -49,8 +79,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
     checkWA();
     const interval = setInterval(async () => {
-      try { const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`); const d = await r.json(); setWaConnected(!!d.connected); } catch {}
+      try {
+        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
+        const d = await r.json();
+        setWaConnected(!!d.connected);
+      } catch {}
     }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // WA connect alert polling
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const r = await api.get('/api/auth/wa-alert');
+        if (r.data?.alert) setWaAlert(true);
+      } catch {}
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
@@ -152,7 +197,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto">{children}</main>
+        <main className="flex-1 overflow-auto">
+          {/* WA Alert Banner */}
+          {waAlert && (
+            <div className="flex items-center gap-3 px-4 py-2.5 text-sm animate-slide-down" style={{ background: 'var(--green-dim)', color: 'var(--green)', borderBottom: '0.5px solid var(--border)' }}>
+              <Bell size={16} />
+              <span className="flex-1">New WhatsApp session connected — aapka session secure hai</span>
+              <button onClick={() => setWaAlert(false)} className="text-xs font-medium px-2.5 py-1 rounded-lg hover:opacity-70" style={{ background: 'var(--green)', color: '#fff' }}>OK</button>
+            </div>
+          )}
+          {children}
+        </main>
       </div>
 
       {/* ─── Bottom Nav ─── */}

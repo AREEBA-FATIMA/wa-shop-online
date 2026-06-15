@@ -425,6 +425,16 @@ export default function ConnectWA() {
             style={{ color: 'var(--text3)' }}>
             Skip — baad mein connect karna hai
           </button>
+
+          {/* Security notice */}
+          <div className="mt-6 p-3 rounded-xl text-left text-xs space-y-1.5 animate-fade-in"
+            style={{ background: 'rgba(250,204,21,0.08)', color: 'var(--text3)' }}>
+            <p className="font-semibold text-[11px] uppercase tracking-wider" style={{ color: '#facc15' }}>Security Info</p>
+            <p>🔒 Aapka WhatsApp session encrypted hai — koi aur is system se aapka WhatsApp access nahi kar sakta</p>
+            <p>📱 Kabhi bhi apne phone se WhatsApp → Linked Devices ja kar session remove kar sakte hain</p>
+            <p>🛡️ Messages end-to-end encrypted store hote hain — sirf aap aur customer dekh sakte hain</p>
+            <p>⚠️ Kisi aur ko apna QR ya pairing code share na karein</p>
+          </div>
         </div>
       </div>
 

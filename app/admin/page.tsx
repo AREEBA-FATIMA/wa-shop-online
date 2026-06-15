@@ -1,33 +1,99 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Users, Wifi, WifiOff, Shield, Search, ArrowUpRight, Crown, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Users, Wifi, WifiOff, Shield, Search, ArrowUpRight, Crown, Clock, CheckCircle, XCircle, KeyRound } from 'lucide-react';
 
 export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [tab, setTab] = useState<'users' | 'payments'>('users');
+  const [adminSecret, setAdminSecret] = useState('');
+  const [adminAuthed, setAdminAuthed] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [tab, setTab] = useState('users');
+
+  function getAdminHeaders() {
+    const secret = localStorage.getItem('admin_secret');
+    return secret ? { Authorization: `Bearer ${secret}` } : {};
+  }
 
   useEffect(() => {
-    api.get('/api/admin/users').then(r => setUsers(r.data)).catch(() => {});
-    api.get('/api/admin/payments').then(r => setPayments(r.data)).catch(() => {});
-    setLoading(false);
+    const saved = localStorage.getItem('admin_secret');
+    if (saved) {
+      setAdminSecret(saved);
+      setAdminAuthed(true);
+      fetchData(saved);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  async function setPlan(id: string, plan: string) { try { await api.put(`/api/admin/users/${id}/plan`, { plan }); setUsers(u => u.map(x => x.id === id ? { ...x, plan } : x)); } catch {} }
+  async function fetchData(secret?: string) {
+    const headers = secret ? { Authorization: `Bearer ${secret}` } : {};
+    try {
+      const [u, p] = await Promise.all([
+        api.get('/api/admin/users', { headers }),
+        api.get('/api/admin/payments', { headers }),
+      ]);
+      setUsers(u.data);
+      setPayments(p.data);
+      setAdminAuthed(true);
+      setAuthError('');
+    } catch (e: any) {
+      if (e?.response?.status === 401 || e?.response?.status === 403) {
+        setAuthError('Wrong admin secret');
+        setAdminAuthed(false);
+        localStorage.removeItem('admin_secret');
+      }
+    }
+    setLoading(false);
+  }
+
+  function login() {
+    if (!adminSecret.trim()) return;
+    localStorage.setItem('admin_secret', adminSecret.trim());
+    setLoading(true);
+    fetchData(adminSecret.trim());
+  }
+
+  async function setPlan(id: string, plan: string) { try { await api.put(`/api/admin/users/${id}/plan`, { plan }, { headers: getAdminHeaders() }); setUsers(u => u.map(x => x.id === id ? { ...x, plan } : x)); } catch {} }
 
   async function approvePayment(id: string) {
-    try { await api.post(`/api/admin/payments/${id}/approve`); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'approved' } : x)); } catch {}
+    try { await api.post(`/api/admin/payments/${id}/approve`, {}, { headers: getAdminHeaders() }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'approved' } : x)); } catch {}
   }
 
   async function rejectPayment(id: string) {
-    try { await api.post(`/api/admin/payments/${id}/reject`); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'rejected' } : x)); } catch {}
+    try { await api.post(`/api/admin/payments/${id}/reject`, {}, { headers: getAdminHeaders() }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'rejected' } : x)); } catch {}
   }
 
   const filtered = users.filter(u => u.name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search));
   const pendingPayments = payments.filter(p => p.status === 'pending');
+
+  // If not authed, show login prompt
+  if (!adminAuthed) {
+    return (
+      <div className="p-4 md:p-6 max-w-sm mx-auto space-y-5">
+        <div className="flex items-center gap-3">
+          <span className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(124,58,237,0.12)' }}>
+            <Shield size={18} style={{ color: '#7c3aed' }} />
+          </span>
+          <div>
+            <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Admin</h1>
+            <p className="text-sm" style={{ color: 'var(--text3)' }}>Enter admin secret to continue</p>
+          </div>
+        </div>
+        <div className="rounded-2xl p-6 space-y-4 text-center" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
+          <KeyRound size={28} className="mx-auto" style={{ color: 'var(--text3)' }} />
+          <input value={adminSecret} onChange={e => setAdminSecret(e.target.value)} type="password" placeholder="Admin Secret" className="field text-center" onKeyDown={e => { if (e.key === 'Enter') login(); }} />
+          {authError && <p className="text-xs" style={{ color: '#e05a5a' }}>{authError}</p>}
+          <button onClick={login} className="btn-primary w-full justify-center text-sm" disabled={loading}>
+            {loading ? 'Checking...' : 'Login'}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-5">
