@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import api from '@/lib/api';
 import { Users, Wifi, WifiOff, Shield, Search, ArrowUpRight, Crown, Clock, CheckCircle, XCircle, KeyRound } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function AdminPage() {
   const [users, setUsers] = useState<any[]>([]);
@@ -12,11 +13,6 @@ export default function AdminPage() {
   const [adminAuthed, setAdminAuthed] = useState(false);
   const [authError, setAuthError] = useState('');
   const [tab, setTab] = useState('users');
-
-  function getAdminHeaders() {
-    const secret = localStorage.getItem('admin_secret');
-    return secret ? { Authorization: `Bearer ${secret}` } : {};
-  }
 
   useEffect(() => {
     const saved = localStorage.getItem('admin_secret');
@@ -29,15 +25,24 @@ export default function AdminPage() {
     }
   }, []);
 
+  async function adminFetch(path: string, options: RequestInit = {}) {
+    const secret = localStorage.getItem('admin_secret');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json', ...(options.headers || {}) as Record<string, string> };
+    if (secret) headers['Authorization'] = `Bearer ${secret}`;
+    const r = await fetch(`${API_BASE}${path}`, { ...options, headers });
+    if (!r.ok) throw { response: { status: r.status, data: await r.json().catch(() => ({})) } };
+    return r.json();
+  }
+
   async function fetchData(secret?: string) {
-    const headers = secret ? { Authorization: `Bearer ${secret}` } : {};
+    if (secret) localStorage.setItem('admin_secret', secret);
     try {
       const [u, p] = await Promise.all([
-        api.get('/api/admin/users', { headers }),
-        api.get('/api/admin/payments', { headers }),
+        adminFetch('/api/admin/users'),
+        adminFetch('/api/admin/payments'),
       ]);
-      setUsers(u.data);
-      setPayments(p.data);
+      setUsers(u);
+      setPayments(p);
       setAdminAuthed(true);
       setAuthError('');
     } catch (e: any) {
@@ -57,14 +62,16 @@ export default function AdminPage() {
     fetchData(adminSecret.trim());
   }
 
-  async function setPlan(id: string, plan: string) { try { await api.put(`/api/admin/users/${id}/plan`, { plan }, { headers: getAdminHeaders() }); setUsers(u => u.map(x => x.id === id ? { ...x, plan } : x)); } catch {} }
+  async function setPlan(id: string, plan: string) {
+    try { await adminFetch(`/api/admin/users/${id}/plan`, { method: 'PUT', body: JSON.stringify({ plan }) }); setUsers(u => u.map(x => x.id === id ? { ...x, plan } : x)); } catch {}
+  }
 
   async function approvePayment(id: string) {
-    try { await api.post(`/api/admin/payments/${id}/approve`, {}, { headers: getAdminHeaders() }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'approved' } : x)); } catch {}
+    try { await adminFetch(`/api/admin/payments/${id}/approve`, { method: 'POST', body: '{}' }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'approved' } : x)); } catch {}
   }
 
   async function rejectPayment(id: string) {
-    try { await api.post(`/api/admin/payments/${id}/reject`, {}, { headers: getAdminHeaders() }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'rejected' } : x)); } catch {}
+    try { await adminFetch(`/api/admin/payments/${id}/reject`, { method: 'POST', body: '{}' }); setPayments(p => p.map(x => x.id === id ? { ...x, status: 'rejected' } : x)); } catch {}
   }
 
   const filtered = users.filter(u => u.name?.toLowerCase().includes(search.toLowerCase()) || u.phone?.includes(search));
