@@ -10,6 +10,8 @@ interface Session { token_preview: string; ip: string; agent: string; created: s
 const PLAN_STYLE: Record<string, { label: string; color: string }> = {
   free: { label: 'Free', color: '#8899a6' },
   trial: { label: 'Trial', color: '#60a5fa' },
+  basic: { label: 'Basic', color: '#facc15' },
+  pro: { label: 'Pro', color: '#c084fc' },
   premium: { label: 'Premium', color: '#facc15' },
   enterprise: { label: 'Enterprise', color: '#c084fc' },
 };
