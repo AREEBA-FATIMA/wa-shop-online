@@ -121,7 +121,7 @@ export default function ProductsPage() {
                     {p.discount_price && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium" style={{ color: p.stock <= 3 ? '#e05a5a' : 'var(--text2)' }}>{p.stock} left</p>
+                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} left{p.ordered_count > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
                     {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>Floor: Rs.{p.floor_price}</p>}
                   </div>
                 </div>
@@ -144,7 +144,7 @@ export default function ProductsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{p.name}</p>
-                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {p.stock} left</p>
+                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} left{p.ordered_count > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full`}
                 style={p.include_in_status ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'var(--bg3)', color: 'var(--text3)' }}>

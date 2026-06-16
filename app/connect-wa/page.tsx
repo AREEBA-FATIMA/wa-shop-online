@@ -40,20 +40,21 @@ export default function ConnectWA() {
       esRef.current = es;
       qrReadyRef.current = resolve;
 
-      // Frontend timeout — 90 seconds
+      // Frontend timeout — 120 seconds (session restore mein 3×45s lag sakte hain)
       timeoutRef.current = setTimeout(() => {
         setFrontendTimeout(true);
         setStatus('error');
-        setErrMsg('WhatsApp load hone mein zyada waqt lag raha hai. Dobara try karein.');
+        setErrMsg('WhatsApp load nahi ho raha. Dobara try karein.');
         es.close();
         if (qrReadyRef.current) { qrReadyRef.current(); qrReadyRef.current = null; }
-      }, 90000);
+      }, 120000);
 
       es.onmessage = (e) => {
         try {
           const data = JSON.parse(e.data);
           if (data.event === 'loading') {
             setStep(1);
+            if (data.message) setErrMsg(data.message);
           } else if (data.event === 'qr') {
             setQrImg(data.qrCode);
             setStatus('qr');
@@ -378,7 +379,7 @@ export default function ConnectWA() {
               ) : status === 'loading' ? (
                 <div className="py-6">
                   <Loader2 size={36} className="mx-auto mb-3 animate-spin" style={{ color: 'var(--green)' }} />
-                  <p className="text-sm" style={{ color: 'var(--text2)' }}>Tayyar ho raha hai...</p>
+                  <p className="text-sm" style={{ color: 'var(--text2)' }}>{errMsg || 'Tayyar ho raha hai...'}</p>
                   <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>30-60 seconds lag sakte hain</p>
                 </div>
               ) : status === 'qr' && qrImg ? (

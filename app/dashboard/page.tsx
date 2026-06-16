@@ -71,7 +71,7 @@ export default function DashboardHome() {
             <div className="flex flex-wrap gap-1.5">
               {stats.low_stock.map((p: any, i: number) => (
                 <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ background: 'rgba(234,160,30,0.12)', color: '#e8a030', border: '0.5px solid rgba(234,160,30,0.2)' }}>
-                  {p.name} — {p.stock} left
+                  {p.name} — {p.stock} left{p.ordered ? ` (${p.ordered} ordered)` : ''}
                 </span>
               ))}
             </div>
