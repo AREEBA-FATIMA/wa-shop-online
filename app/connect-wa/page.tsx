@@ -131,6 +131,8 @@ export default function ConnectWA() {
       if (data.success) {
         setPairingCode(data.code);
         setStep(3);
+        // SSE kholo taake authenticated/ready events listen ho
+        startSSE(userId).catch(() => {});
       } else {
         setPairingError(data.error || 'Code nahi mila — dobara try karo');
       }
