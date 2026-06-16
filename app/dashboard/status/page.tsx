@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
-import { Radio, Send, Loader2, Calendar, Settings2, Hash } from 'lucide-react';
+import { Radio, Send, Loader2, Calendar, Settings2, Hash, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -14,11 +14,22 @@ export default function StatusPage() {
   const [msg, setMsg] = useState('');
   const [waConnected, setWaConnected] = useState(false);
   const [userId, setUserId] = useState('');
+  const [scheduleActive, setScheduleActive] = useState(false);
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('wa_user') || '{}');
     setUserId(u.id || '');
-    if (u.id) api.get(`/api/wa/status/${u.id}`).then(r => setWaConnected(r.data.connected)).catch(() => {});
+    if (u.id) {
+      api.get(`/api/wa/status/${u.id}`).then(r => setWaConnected(r.data.connected)).catch(() => {});
+      api.get('/api/schedule').then(r => {
+        if (r.data.scheduled) {
+          setScheduleActive(true);
+          setPostTime(r.data.post_time);
+          setCount(r.data.count);
+          setDays(r.data.days_of_week);
+        }
+      }).catch(() => {});
+    }
   }, []);
 
   const toggleDay = (d: number) => setDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d].sort());
@@ -40,7 +51,14 @@ export default function StatusPage() {
   async function saveSchedule() {
     if (!userId) return;
     setSending(true); setMsg('');
-    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days }); setMsg('Schedule saved!'); } catch { setMsg('Schedule failed'); }
+    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days }); setScheduleActive(true); setMsg('Schedule saved!'); } catch { setMsg('Schedule failed'); }
+    setSending(false);
+  }
+
+  async function removeSchedule() {
+    if (!userId) return;
+    setSending(true);
+    try { await api.delete('/api/schedule'); setScheduleActive(false); setMsg('Schedule hata diya'); } catch { setMsg('Remove failed'); }
     setSending(false);
   }
 
@@ -90,6 +108,17 @@ export default function StatusPage() {
             ))}
           </div>
         </div>
+
+        {/* Schedule status */}
+        {scheduleActive && (
+          <div className="rounded-2xl p-3 flex items-center gap-2 animate-fade-in" style={{ background: 'var(--green-dim)', border: '0.5px solid rgba(37,211,102,0.3)' }}>
+            <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: 'var(--green)' }} />
+            <p className="text-xs font-medium" style={{ color: 'var(--green)' }}>
+              Scheduled: {DAYS.filter((_, i) => days.includes(i + 1)).join(', ')} at {postTime} — {count} products
+            </p>
+            <button onClick={removeSchedule} disabled={sending} className="ml-auto text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}><Trash2 size={11} className="inline" /> Remove</button>
+          </div>
+        )}
 
         <div className="flex gap-3">
           <button onClick={postNow} disabled={sending || !waConnected}
