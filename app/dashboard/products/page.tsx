@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera, Grid3X3, List,
 interface Product {
   id: string; name: string; description: string; price: number;
   discount_price: number | null; floor_price: number; stock: number;
+  available_stock?: number; ordered_count?: number;
   category: string | null; include_in_status: boolean; image_url?: string;
 }
 
@@ -121,7 +122,7 @@ export default function ProductsPage() {
                     {p.discount_price && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} left{p.ordered_count > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
+                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} left{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
                     {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>Floor: Rs.{p.floor_price}</p>}
                   </div>
                 </div>
