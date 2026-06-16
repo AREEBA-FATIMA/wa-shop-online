@@ -145,7 +145,7 @@ export default function ProductsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{p.name}</p>
-                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} left{p.ordered_count > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
+                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} left{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full`}
                 style={p.include_in_status ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'var(--bg3)', color: 'var(--text3)' }}>
