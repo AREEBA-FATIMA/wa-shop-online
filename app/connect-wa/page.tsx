@@ -114,13 +114,16 @@ export default function ConnectWA() {
     }
     setPairingError(''); setPairingCode(''); setPairingLoading(true);
     setFrontendTimeout(false);
+    setStep(1);
+    setStatus('loading');
 
-    // Step 1: Start WhatsApp
-    await startAndWaitForQR(userId);
-    if (status === 'error') { setPairingLoading(false); return; }
+    // SSE connection for progress (client start karta hai — pairing endpoint
+    // us client ko kill karke phone number ke saath restart kare ga)
+    startSSE(userId).catch(() => {});
 
-    // Step 2: Get pairing code
-    setStep(3);
+    // Directly call pairing code endpoint — backend
+    // handles client init + code generation internally
+    setStep(2);
     try {
       const r = await fetch(`${WA_URL}/wa/pairing-code/${userId}`, {
         method: 'POST',
@@ -130,6 +133,7 @@ export default function ConnectWA() {
       const data = await r.json();
       if (data.success) {
         setPairingCode(data.code);
+        setStep(3);
       } else {
         setPairingError(data.error || 'Code nahi mila — dobara try karo');
       }
