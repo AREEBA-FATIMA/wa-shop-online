@@ -117,12 +117,9 @@ export default function ConnectWA() {
     setStep(1);
     setStatus('loading');
 
-    // SSE connection for progress (client start karta hai — pairing endpoint
-    // us client ko kill karke phone number ke saath restart kare ga)
-    startSSE(userId).catch(() => {});
-
-    // Directly call pairing code endpoint — backend
-    // handles client init + code generation internally
+    // Directly call pairing code endpoint — backend handles
+    // client init + code generation internally. SSE connection
+    // nahi kholte (warna QR client start ho kar race condition lage ga)
     setStep(2);
     try {
       const r = await fetch(`${WA_URL}/wa/pairing-code/${userId}`, {
