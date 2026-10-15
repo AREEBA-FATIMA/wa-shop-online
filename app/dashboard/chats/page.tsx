@@ -151,22 +151,22 @@ export default function ChatsPage() {
         ) : (
           <>
             {/* Header */}
-            <div className="h-14 flex items-center px-4 gap-3 shrink-0" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
-              <button onClick={() => setActive(null)} className="md:hidden -ml-1 p-1" style={{ color: 'var(--text2)' }}>
+            <div className="h-16 flex items-center px-4 gap-3 shrink-0" style={{ background: 'var(--teal)', color: '#fff' }}>
+              <button onClick={() => setActive(null)} className="md:hidden -ml-1 p-1" style={{ color: '#fff' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
               </button>
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: 'rgba(255,255,255,0.22)', color: '#fff' }}>
                 {active.customer_name?.charAt(0)?.toUpperCase() || active.customer_phone.slice(-2)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{active.customer_name || active.customer_phone}</p>
-                <p className="text-[11px]" style={{ color: 'var(--text3)' }}>{active.customer_phone}</p>
+                <p className="text-sm font-semibold truncate" style={{ color: '#fff' }}>{active.customer_name || active.customer_phone}</p>
+                <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{active.customer_phone}</p>
               </div>
-              <button className="p-1.5 rounded-lg transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}><MoreVertical size={16} /></button>
+              <button className="p-1.5 rounded-lg transition-colors hover:bg-white/10" style={{ color: '#fff' }}><MoreVertical size={16} /></button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-2" style={{ background: 'var(--bg)' }}>
+            <div className="chat-wall flex-1 overflow-y-auto p-4 space-y-2">
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'var(--bg3)' }}><MessageCircle size={20} style={{ color: 'var(--text3)' }} /></div>
@@ -189,9 +189,8 @@ export default function ChatsPage() {
                       )}
                       {isCustomer && !showAvatar && <div className="w-7 shrink-0" />}
                       <div className="max-w-[75%]">
-                        <div className={`px-3.5 py-2 ${isCustomer ? 'rounded-2xl rounded-tl-sm' : 'rounded-2xl rounded-br-sm'}`}
-                          style={{ background: isCustomer ? 'var(--bg3)' : 'var(--green-dim)', border: isCustomer ? 'none' : '0.5px solid rgba(37,211,102,0.15)' }}>
-                          <p className="text-sm leading-relaxed" style={{ color: isCustomer ? 'var(--text)' : 'var(--text)' }}>{msg.content}</p>
+                        <div className={`px-3 py-2 ${isCustomer ? 'wa-bubble-in' : 'wa-bubble-out'}`}>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words" style={{ color: 'var(--text)' }}>{msg.content}</p>
                         </div>
                         <div className={`flex items-center gap-1 mt-0.5 ${isCustomer ? '' : 'justify-end'}`}>
                           <span className="text-[10px]" style={{ opacity: 0.4, color: 'var(--text)' }}>{formatTime(msg.created_at)}</span>

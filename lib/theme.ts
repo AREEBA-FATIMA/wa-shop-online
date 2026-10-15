@@ -1,6 +1,6 @@
 export function getTheme(): 'dark' | 'light' {
-  if (typeof window === 'undefined') return 'dark';
-  return (localStorage.getItem('wa_theme') as 'dark' | 'light') || 'dark';
+  if (typeof window === 'undefined') return 'light';
+  return (localStorage.getItem('wa_theme') as 'dark' | 'light') || 'light';
 }
 
 export function setTheme(theme: 'dark' | 'light') {

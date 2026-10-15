@@ -49,13 +49,46 @@ export default function ProductsPage() {
   async function del(id: string) { if (!confirm('Delete this product?')) return; try { await api.delete(`/api/products/${id}`); await load(); } catch {} }
   function upd(k: string, v: any) { setForm(f => ({ ...f, [k]: v })); }
 
+  // Downscale + compress in the browser so uploads are small and reliable
+  // (a raw phone photo as base64 is multiple MB and used to fail to save).
+  function resizeImage(file: File, maxSide = 1280, quality = 0.82): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxSide || height > maxSide) {
+            if (width >= height) { height = Math.round(height * maxSide / width); width = maxSide; }
+            else { width = Math.round(width * maxSide / height); height = maxSide; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { reject(new Error('no canvas')); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = reader.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleImagePick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]; if (!file) return;
     if (!file.type.startsWith('image/')) { setErr('Only images allowed'); return; }
-    if (file.size > 5 * 1024 * 1024) { setErr('Image max 5MB'); return; }
-    const reader = new FileReader();
-    reader.onload = (ev) => { setImgPreview(ev.target?.result as string); upd('image_url', ev.target?.result as string); };
-    reader.readAsDataURL(file);
+    if (file.size > 15 * 1024 * 1024) { setErr('Image max 15MB'); return; }
+    setErr('');
+    try {
+      const dataUrl = await resizeImage(file);
+      setImgPreview(dataUrl);
+      upd('image_url', dataUrl);
+    } catch {
+      setErr('Image process nahi hui — dusri image try karein');
+    }
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
