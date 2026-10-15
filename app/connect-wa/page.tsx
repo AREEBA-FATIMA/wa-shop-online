@@ -2,10 +2,12 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, CheckCircle2, XCircle, RefreshCw, Smartphone, QrCode, Loader2, Copy, ArrowLeft, Lock, Shield, AlertTriangle } from 'lucide-react';
+import { getToken } from '@/lib/api';
 
 type ConnectStatus = 'idle' | 'loading' | 'qr' | 'authenticated' | 'ready' | 'error';
 
 const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL || '';
+const waAuth = (): Record<string, string> => { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {}; };
 
 export default function ConnectWA() {
   const router = useRouter();
@@ -36,7 +38,9 @@ export default function ConnectWA() {
   function startSSE(userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (esRef.current) esRef.current.close();
-      const es = new EventSource(`${WA_URL}/wa/qr/${userId}`);
+      // EventSource can't set headers, so pass the token as a query param.
+      const tok = getToken();
+      const es = new EventSource(`${WA_URL}/wa/qr/${userId}${tok ? `?token=${encodeURIComponent(tok)}` : ''}`);
       esRef.current = es;
       qrReadyRef.current = resolve;
 
@@ -92,7 +96,7 @@ export default function ConnectWA() {
     setStatus('loading');
     setFrontendTimeout(false);
     setStep(1);
-    try { await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST' }); } catch {}
+    try { await fetch(`${WA_URL}/wa/restart/${userId}`, { method: 'POST', headers: waAuth() }); } catch {}
     await new Promise(r => setTimeout(r, 1500));
     await startSSE(userId);
   }
@@ -124,7 +128,7 @@ export default function ConnectWA() {
     try {
       const r = await fetch(`${WA_URL}/wa/pairing-code/${userId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...waAuth() },
         body: JSON.stringify({ phone: cleanPhone })
       });
       const data = await r.json();
@@ -173,7 +177,7 @@ export default function ConnectWA() {
 
     async function checkStatus() {
       try {
-        const r = await fetch(`${WA_URL}/wa/status/${userId}`);
+        const r = await fetch(`${WA_URL}/wa/status/${userId}`, { headers: waAuth() });
         const d = await r.json();
         if (d.connected) {
           router.push('/dashboard');

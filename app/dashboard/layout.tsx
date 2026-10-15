@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell } from 'lucide-react';
-import api, { removeToken } from '@/lib/api';
+import api, { removeToken, getToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 import { LangProvider, useT } from '@/contexts/LangContext';
 
@@ -72,9 +72,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     if (!u) { router.push('/auth/login'); return; }
     const parsed = JSON.parse(u);
     setUser(parsed);
+    const waAuth = (): Record<string, string> => { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {}; };
     async function checkWA() {
       try {
-        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
+        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`, { headers: waAuth() });
         const d = await r.json();
         setWaConnected(!!d.connected);
       } catch { setWaConnected(false); }
@@ -82,7 +83,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     checkWA();
     const interval = setInterval(async () => {
       try {
-        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`);
+        const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`, { headers: waAuth() });
         const d = await r.json();
         setWaConnected(!!d.connected);
       } catch {}
