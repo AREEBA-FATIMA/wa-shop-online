@@ -1,10 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useT } from '@/contexts/LangContext';
 import { Users, Wifi, WifiOff, Shield, Search, ArrowUpRight, Crown, Clock, CheckCircle, XCircle, KeyRound } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function AdminPage() {
+  const { t } = useT();
   const [users, setUsers] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,16 +88,16 @@ export default function AdminPage() {
             <Shield size={18} style={{ color: '#7c3aed' }} />
           </span>
           <div>
-            <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Admin</h1>
-            <p className="text-sm" style={{ color: 'var(--text3)' }}>Enter admin secret to continue</p>
+            <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('admin_title')}</h1>
+            <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('admin_secret_placeholder')}</p>
           </div>
         </div>
         <div className="rounded-2xl p-6 space-y-4 text-center" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
           <KeyRound size={28} className="mx-auto" style={{ color: 'var(--text3)' }} />
-          <input value={adminSecret} onChange={e => setAdminSecret(e.target.value)} type="password" placeholder="Admin Secret" className="field text-center" onKeyDown={e => { if (e.key === 'Enter') login(); }} />
+          <input value={adminSecret} onChange={e => setAdminSecret(e.target.value)} type="password" placeholder={t('admin_secret_placeholder')} className="field text-center" onKeyDown={e => { if (e.key === 'Enter') login(); }} />
           {authError && <p className="text-xs" style={{ color: '#e05a5a' }}>{authError}</p>}
           <button onClick={login} className="btn-primary w-full justify-center text-sm" disabled={loading}>
-            {loading ? 'Checking...' : 'Login'}
+            {loading ? '...' : t('auth_login_cta')}
           </button>
         </div>
       </div>
@@ -109,18 +111,18 @@ export default function AdminPage() {
           <Shield size={18} style={{ color: '#7c3aed' }} />
         </span>
         <div>
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Admin</h1>
-          <p className="text-sm" style={{ color: 'var(--text3)' }}>Manage users, plans & payments</p>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('admin_title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('admin_sub')}</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Total Users', value: users.length, color: 'var(--text)', bg: 'var(--bg3)' },
-          { label: 'WA Connected', value: users.filter(u => u.wa_connected).length, color: 'var(--green)', bg: 'var(--green-dim)' },
-          { label: 'Paid Users', value: users.filter(u => u.plan !== 'free').length, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
-          { label: 'Pending Payments', value: pendingPayments.length, color: '#facc15', bg: 'rgba(250,204,21,0.12)' },
+          { label: t('admin_total_users'), value: users.length, color: 'var(--text)', bg: 'var(--bg3)' },
+          { label: t('admin_wa_connected'), value: users.filter(u => u.wa_connected).length, color: 'var(--green)', bg: 'var(--green-dim)' },
+          { label: t('admin_paid_users'), value: users.filter(u => u.plan !== 'free').length, color: '#a855f7', bg: 'rgba(168,85,247,0.12)' },
+          { label: t('admin_pending_payments'), value: pendingPayments.length, color: '#facc15', bg: 'rgba(250,204,21,0.12)' },
         ].map((s, i) => (
           <div key={i} className="rounded-2xl p-4 text-center" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
             <p className="brand text-2xl font-bold" style={{ color: s.color }}>{s.value}</p>
@@ -148,7 +150,7 @@ export default function AdminPage() {
         <>
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users..." className="field pl-9" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('admin_search')} className="field pl-9" />
           </div>
           <div className="rounded-2xl overflow-hidden" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
             <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '0.5px solid var(--border)' }}>
@@ -159,7 +161,7 @@ export default function AdminPage() {
             {loading ? (
               <div className="p-8 text-center text-sm" style={{ color: 'var(--text3)' }}>Loading...</div>
             ) : filtered.length === 0 ? (
-              <div className="p-8 text-center text-sm" style={{ color: 'var(--text3)' }}>No users found</div>
+              <div className="p-8 text-center text-sm" style={{ color: 'var(--text3)' }}>{t('admin_no_users')}</div>
             ) : (
               <div>
                 {filtered.map((u, i) => (
@@ -196,7 +198,7 @@ export default function AdminPage() {
             <span className="text-xs ml-auto" style={{ color: 'var(--text3)' }}>{payments.length} total</span>
           </div>
           {payments.length === 0 ? (
-            <div className="p-8 text-center text-sm" style={{ color: 'var(--text3)' }}>No payment requests</div>
+            <div className="p-8 text-center text-sm" style={{ color: 'var(--text3)' }}>{t('admin_no_payments')}</div>
           ) : (
             <div>
               {payments.map((p, i) => {
@@ -215,10 +217,10 @@ export default function AdminPage() {
                     {p.status === 'pending' ? (
                       <div className="flex items-center gap-1.5">
                         <button onClick={() => approvePayment(p.id)} className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-all" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>
-                          <CheckCircle size={12} className="inline mr-1" />Approve
+                          <CheckCircle size={12} className="inline mr-1" />{t('admin_approve')}
                         </button>
                         <button onClick={() => rejectPayment(p.id)} className="text-xs px-2.5 py-1.5 rounded-lg font-medium transition-all" style={{ background: 'rgba(220,50,50,0.08)', color: '#e05a5a' }}>
-                          <XCircle size={12} className="inline mr-1" />Reject
+                          <XCircle size={12} className="inline mr-1" />{t('admin_reject')}
                         </button>
                       </div>
                     ) : (
@@ -228,7 +230,7 @@ export default function AdminPage() {
                         background: p.status === 'approved' ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
                         color: p.status === 'approved' ? 'var(--green)' : '#e05a5a'
                       }}>
-                        {p.status === 'approved' ? <><CheckCircle size={12} className="inline mr-1" />Approved</> : <><XCircle size={12} className="inline mr-1" />Rejected</>}
+                        {p.status === 'approved' ? <><CheckCircle size={12} className="inline mr-1" />{t('admin_approve')}d</> : <><XCircle size={12} className="inline mr-1" />{t('admin_reject')}ed</>}
                       </span>
                     )}
                   </div>

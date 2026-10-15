@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 import { Loader2, Check, CheckCircle, Wifi, WifiOff, Crown, Clock, User, Globe, Bot, ShieldCheck, ChevronRight, Smartphone, LogOut, ExternalLink, Monitor, Trash2, KeyRound, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 
@@ -17,6 +18,7 @@ const PLAN_STYLE: Record<string, { label: string; color: string }> = {
 };
 
 export default function SettingsPage() {
+  const { t } = useT();
   const [form, setForm] = useState({ name: '', language: 'roman_ur', ai_auto_reply: true });
   const [userData, setUserData] = useState<UserData | null>(null);
   const [waStatus, setWaStatus] = useState<{ connected: boolean; phone?: string } | null>(null);
@@ -127,8 +129,8 @@ export default function SettingsPage() {
           <User size={18} style={{ color: 'var(--text2)' }} />
         </span>
         <div>
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Settings</h1>
-          <p className="text-sm" style={{ color: 'var(--text3)' }}>Manage your account</p>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('settings_title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('settings_sub')}</p>
         </div>
       </div>
 
@@ -153,11 +155,11 @@ export default function SettingsPage() {
 
         <div className="space-y-3">
           <div>
-            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>Name</label>
+            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t('set_name')}</label>
             <input value={form.name} onChange={e => upd('name', e.target.value)} className="field" />
           </div>
           <div>
-            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>Phone</label>
+            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t('set_phone')}</label>
             <input value={userData?.phone || ''} disabled className="field opacity-50 cursor-not-allowed" />
           </div>
         </div>
@@ -170,7 +172,7 @@ export default function SettingsPage() {
         </h2>
         <div className="space-y-4">
           <div>
-            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>Reply language</label>
+            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t('set_reply_lang')}</label>
             <select value={form.language} onChange={e => upd('language', e.target.value)} className="field">
               <option value="roman_ur">Roman Urdu</option>
               <option value="urdu">اردو (Urdu)</option>
@@ -208,7 +210,7 @@ export default function SettingsPage() {
           <ChevronRight size={16} style={{ color: 'var(--text3)' }} />
         </div>
         {waStatus?.connected ? (
-          <button onClick={disconnect} className="text-xs font-medium px-4 py-2 rounded-xl transition-all" style={{ color: '#e05a5a', border: '0.5px solid rgba(220,50,50,0.3)' }}>Disconnect</button>
+          <button onClick={disconnect} className="text-xs font-medium px-4 py-2 rounded-xl transition-all" style={{ color: '#e05a5a', border: '0.5px solid rgba(220,50,50,0.3)' }}>{t('set_disconnect')}</button>
         ) : (
           <Link href="/connect-wa" className="btn-primary text-sm">Connect WhatsApp</Link>
         )}

@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api, { setToken } from '@/lib/api';
 import { MessageCircle, Phone, Lock, User, Loader2, ArrowRight, Globe } from 'lucide-react';
+import { useT } from '@/contexts/LangContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Register() {
   const router = useRouter();
+  const { t } = useT();
   const [form, setForm] = useState({ name: '', phone: '', password: '', language: 'roman_ur' });
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
@@ -22,7 +25,7 @@ export default function Register() {
       localStorage.setItem('wa_user', JSON.stringify(res.data.user));
       router.push('/connect-wa');
     } catch (e: any) {
-      setErr(e.response?.data?.detail || 'Registration failed');
+      setErr(e.response?.data?.detail || t('auth_register_failed'));
     } finally { setLoading(false); }
   }
 
@@ -37,35 +40,36 @@ export default function Register() {
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mx-auto mb-6">
             <MessageCircle size={32} className="text-white" />
           </div>
-          <h2 className="brand font-bold text-4xl mb-3">Free Trial Start</h2>
-          <p className="text-white/70 max-w-sm">7 din free — koi card nahi chahiye. Apna WhatsApp dukaan banayein!</p>
+          <h2 className="brand font-bold text-4xl mb-3">{t('auth_join')}</h2>
+          <p className="text-white/70 max-w-sm">{t('auth_join_sub')}</p>
         </div>
       </div>
 
       {/* Right — Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-8" style={{ background: 'var(--bg)' }}>
         <div className="w-full max-w-sm animate-fade-in">
+          <div className="flex justify-end mb-2"><LanguageSwitcher compact /></div>
           <div className="text-center mb-8">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 lg:hidden"
               style={{ background: 'var(--green-gradient)', boxShadow: '0 8px 24px rgba(37,211,102,0.25)' }}>
               <MessageCircle size={24} className="text-white" />
             </div>
-            <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>Account Banayein</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>Free 7 din trial — koi card nahi chahiye</p>
+            <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>{t('auth_register_title')}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>{t('auth_register_sub')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="floating-label">
               <input value={form.name} onChange={e=>update('name',e.target.value)} placeholder=" " className="field" required />
-              <label><User size={12} style={{ display: 'inline', marginRight: 4 }} />Aapka Naam</label>
+              <label><User size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_name')}</label>
             </div>
             <div className="floating-label">
               <input value={form.phone} onChange={e=>update('phone',e.target.value)} placeholder=" " className="field" required />
-              <label><Phone size={12} style={{ display: 'inline', marginRight: 4 }} />Phone Number</label>
+              <label><Phone size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_phone')}</label>
             </div>
             <div className="floating-label">
               <input value={form.password} onChange={e=>update('password',e.target.value)} type="password" placeholder=" " className="field" required />
-              <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />Password</label>
+              <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_password')}</label>
             </div>
             <div className="floating-label">
               <select value={form.language} onChange={e=>update('language',e.target.value)} className="field" required>
@@ -73,7 +77,7 @@ export default function Register() {
                 <option value="urdu">اردو (Urdu)</option>
                 <option value="en">English</option>
               </select>
-              <label><Globe size={12} style={{ display: 'inline', marginRight: 4 }} />Language / Zaban</label>
+              <label><Globe size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_language')}</label>
             </div>
 
             {err && (
@@ -87,13 +91,13 @@ export default function Register() {
               className="btn-primary-gradient w-full justify-center"
               style={{ opacity: loading ? 0.7 : 1 }}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-              Account Banayein <ArrowRight size={16} />
+              {t('auth_create_cta')} <ArrowRight size={16} />
             </button>
           </form>
 
           <p className="text-center text-xs mt-6" style={{ color: 'var(--text3)' }}>
-            Pehle se account hai?{' '}
-            <Link href="/auth/login" className="font-semibold" style={{ color: 'var(--green)' }}>Login karein</Link>
+            {t('auth_has_account')}{' '}
+            <Link href="/auth/login" className="font-semibold" style={{ color: 'var(--green)' }}>{t('auth_login_link')}</Link>
           </p>
         </div>
       </div>

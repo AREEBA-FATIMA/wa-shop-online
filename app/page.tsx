@@ -2,17 +2,25 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { MessageCircle, Zap, Bot, Package, BarChart3, Shield, Clock, ArrowRight, Check, Star, ChevronDown, Menu, X } from 'lucide-react';
+import { useT } from '@/contexts/LangContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
-const t = {
+const CONTENT: Record<string, any> = {
   en: {
     badge: 'AI-Powered WhatsApp Store',
     title: 'Your WhatsApp,\nNow a Smart Shop',
-    sub: 'Auto-post daily status, let AI answer customers in Urdu, confirm orders — all without WhatsApp API.',
-    f1: 'Start Free', f2: 'See Demo',
+    sub: 'Auto-post daily status, let AI answer customers, confirm orders — all without the WhatsApp API.',
+    f1: 'Start Free', f2: 'See Demo', login: 'Login',
+    feat_head: 'Everything in one place', feat_sub: 'Whatever you need — it is here',
+    stats: [['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','More Sales']],
+    price_head: 'Pricing — PKR', price_sub: 'No risk — start with the free trial',
+    monthly: 'Monthly', yearly: 'Yearly', save: 'Save 20%', popular: 'Most Popular', per_year: '/year',
+    copyright: "Pakistan's first AI WhatsApp reseller platform. © 2025",
+    register: 'Register', privacy: 'Privacy',
     features: [
       { icon: Zap, t: 'Auto Daily Status', d: 'Set products once. AI posts status every day at your time with prices, stock & discounts.' },
       { icon: Bot, t: 'AI Chat Replies', d: 'Customer asks price or bargains — AI replies instantly in Urdu, Roman Urdu or English.' },
-      { icon: Package, t: 'Smart Inventory', d: 'Track stock live. When sold out, removed from status automatically.' },
+      { icon: Package, t: 'Smart Inventory', d: 'Track stock live. When sold out, it is removed from status automatically.' },
       { icon: BarChart3, t: 'Sales Analytics', d: 'See today revenue, top products, stock alerts — one dashboard.' },
       { icon: Shield, t: 'Invisible Branding', d: 'Customers never know you use WA-SHOP. Replies look 100% personal.' },
       { icon: Clock, t: 'Order Tracking', d: 'Every confirmed order saved with customer info. Never lose an order.' },
@@ -26,14 +34,20 @@ const t = {
         f: ['500 products', 'Unlimited msgs', 'AI + bargaining', 'Multi-schedule', 'Full analytics', 'Priority support'] },
     ]
   },
-  ur: {
+  roman_ur: {
     badge: 'AI WhatsApp Dukaan',
     title: 'Apna WhatsApp,\nAb Smart Dukaan',
     sub: 'Roz auto status, AI se jawab, orders track — sab ek jagah se. Koi API key nahi chahiye.',
-    f1: 'Free Shuru', f2: 'Demo Dekho',
+    f1: 'Free Shuru', f2: 'Demo Dekho', login: 'Login',
+    feat_head: 'Sab kuch ek jagah', feat_sub: 'Jo bhi chahiye — sab hai',
+    stats: [['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','Zyada Sales']],
+    price_head: 'Pricing — PKR', price_sub: 'Koi risk nahi — free trial se start karo',
+    monthly: 'Monthly', yearly: 'Yearly', save: '20% bachao', popular: 'Sab se Popular', per_year: '/saal',
+    copyright: 'Pakistan ka pehla AI WhatsApp reseller platform. © 2025',
+    register: 'Register', privacy: 'Privacy',
     features: [
       { icon: Zap, t: 'Roz Auto Status', d: 'Ek baar products daalo. AI roz apne time par status lagayega — price, stock, discount ke sath.' },
-      { icon: Bot, t: 'AI Chat Jawab', d: 'Customer price poche ya bargain kare — AI usi waqt Urdu mein jawab deta hai.' },
+      { icon: Bot, t: 'AI Chat Jawab', d: 'Customer price poche ya bargain kare — AI usi waqt jawab deta hai.' },
       { icon: Package, t: 'Smart Stock', d: 'Real-time stock track. Bik gayi? Auto status se hat jaati hai.' },
       { icon: BarChart3, t: 'Sales Report', d: 'Aaj ki kamai, top products, stock alerts — sab dashboard mein.' },
       { icon: Shield, t: 'Chhupi Pehchaan', d: 'Customer ko pata nahi chalega ke tum WA-SHOP use kar rahe ho.' },
@@ -46,6 +60,34 @@ const t = {
         f: ['50 products', '500 msgs/din', 'AI jawab', 'Auto status', 'Order tracking', 'Analytics'] },
       { name: 'Pro', price: '3,000', per: '/mahine', hot: true, cta: 'Pro Lo',
         f: ['500 products', 'Unlimited msgs', 'AI + bargaining', 'Multi-schedule', 'Full analytics', 'Priority support'] },
+    ]
+  },
+  ur: {
+    badge: 'AI واٹس ایپ دکان',
+    title: 'آپ کا واٹس ایپ،\nاب اسمارٹ دکان',
+    sub: 'روزانہ خودکار اسٹیٹس، AI سے گاہکوں کو جواب، آرڈر کنفرم — سب ایک جگہ۔ کوئی WhatsApp API نہیں چاہیے۔',
+    f1: 'مفت شروع کریں', f2: 'ڈیمو دیکھیں', login: 'لاگ ان',
+    feat_head: 'سب کچھ ایک جگہ', feat_sub: 'جو بھی چاہیے — سب موجود ہے',
+    stats: [['500+','ایکٹو ری سیلرز'],['10K+','آرڈرز'],['98%','ریسپانس ریٹ'],['3x','زیادہ سیلز']],
+    price_head: 'قیمتیں — PKR', price_sub: 'کوئی رسک نہیں — مفت ٹرائل سے شروع کریں',
+    monthly: 'ماہانہ', yearly: 'سالانہ', save: '20% بچائیں', popular: 'سب سے مقبول', per_year: '/سال',
+    copyright: 'پاکستان کا پہلا AI واٹس ایپ ری سیلر پلیٹ فارم۔ © 2025',
+    register: 'رجسٹر', privacy: 'پرائیویسی',
+    features: [
+      { icon: Zap, t: 'روزانہ خودکار اسٹیٹس', d: 'ایک بار پروڈکٹ ڈالیں۔ AI روزانہ آپ کے وقت پر قیمت، اسٹاک اور ڈسکاؤنٹ کے ساتھ اسٹیٹس لگائے گا۔' },
+      { icon: Bot, t: 'AI چیٹ جواب', d: 'گاہک قیمت پوچھے یا مول تول کرے — AI فوراً جواب دیتا ہے۔' },
+      { icon: Package, t: 'اسمارٹ اسٹاک', d: 'اسٹاک لائیو ٹریک۔ بک گیا؟ اسٹیٹس سے خودبخود ہٹ جاتا ہے۔' },
+      { icon: BarChart3, t: 'سیلز رپورٹ', d: 'آج کی کمائی، ٹاپ پروڈکٹس، اسٹاک الرٹ — سب ایک ڈیش بورڈ میں۔' },
+      { icon: Shield, t: 'پوشیدہ برانڈنگ', d: 'گاہک کو پتا نہیں چلے گا کہ آپ WA-SHOP استعمال کر رہے ہیں۔' },
+      { icon: Clock, t: 'آرڈر ٹریکنگ', d: 'ہر کنفرم آرڈر گاہک کی تفصیل کے ساتھ محفوظ۔ کوئی آرڈر ضائع نہیں۔' },
+    ],
+    plans: [
+      { name: 'مفت ٹرائل', price: '0', per: '7 دن', hot: false, cta: 'مفت شروع کریں',
+        f: ['10 پروڈکٹس', '50 پیغام/دن', 'بیسک AI', 'مینوئل اسٹیٹس', 'QR کنیکٹ'] },
+      { name: 'بیسک', price: '1,500', per: '/ماہ', hot: false, cta: 'بیسک لیں',
+        f: ['50 پروڈکٹس', '500 پیغام/دن', 'AI جواب', 'آٹو اسٹیٹس', 'آرڈر ٹریکنگ', 'تجزیہ'] },
+      { name: 'پرو', price: '3,000', per: '/ماہ', hot: true, cta: 'پرو لیں',
+        f: ['500 پروڈکٹس', 'لامحدود پیغام', 'AI + مول تول', 'ملٹی شیڈول', 'مکمل تجزیہ', 'پرائیورٹی سپورٹ'] },
     ]
   }
 };
@@ -74,10 +116,10 @@ function AnimatedSection({ children, className = '' }: { children: React.ReactNo
 }
 
 export default function Landing() {
-  const [lang, setLang] = useState<'en'|'ur'>('ur');
+  const { lang } = useT();
   const [menuOpen, setMenuOpen] = useState(false);
   const [yearly, setYearly] = useState(false);
-  const c = t[lang];
+  const c = CONTENT[lang] || CONTENT.roman_ur;
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
@@ -93,16 +135,8 @@ export default function Landing() {
             </span>
           </Link>
           <div className="hidden md:flex items-center gap-3">
-            <div className="flex rounded-full overflow-hidden text-xs" style={{ border: '0.5px solid var(--border2)' }}>
-              {(['en','ur'] as const).map(l => (
-                <button key={l} onClick={() => setLang(l)}
-                  className="px-3 py-1.5 font-medium transition-colors"
-                  style={{ background: lang===l ? 'var(--green)' : 'transparent', color: lang===l ? '#fff' : 'var(--text2)' }}>
-                  {l === 'en' ? 'EN' : 'UR'}
-                </button>
-              ))}
-            </div>
-            <Link href="/auth/login" className="text-sm font-medium px-3 py-1.5 transition-colors hover:opacity-70" style={{ color: 'var(--text2)' }}>Login</Link>
+            <LanguageSwitcher compact />
+            <Link href="/auth/login" className="text-sm font-medium px-3 py-1.5 transition-colors hover:opacity-70" style={{ color: 'var(--text2)' }}>{c.login}</Link>
             <Link href="/auth/register" className="btn-primary text-sm" style={{ padding: '8px 20px', borderRadius: '100px' }}>
               {c.f1}
             </Link>
@@ -113,16 +147,8 @@ export default function Landing() {
         </div>
         {menuOpen && (
           <div className="md:hidden px-4 pb-4 space-y-2 animate-fade-in">
-            <div className="flex gap-2 mb-3">
-              {(['en','ur'] as const).map(l => (
-                <button key={l} onClick={() => setLang(l)}
-                  className="flex-1 py-2 rounded-lg text-xs font-medium transition-colors"
-                  style={{ background: lang===l ? 'var(--green)' : 'var(--bg3)', color: lang===l ? '#fff' : 'var(--text2)' }}>
-                  {l === 'en' ? 'English' : 'Urdu'}
-                </button>
-              ))}
-            </div>
-            <Link href="/auth/login" className="block text-sm py-2 px-3 rounded-lg" style={{ color: 'var(--text2)' }}>Login</Link>
+            <div className="flex justify-center mb-3"><LanguageSwitcher /></div>
+            <Link href="/auth/login" className="block text-sm py-2 px-3 rounded-lg" style={{ color: 'var(--text2)' }}>{c.login}</Link>
             <Link href="/auth/register" className="block text-sm py-2 px-3 rounded-lg text-center font-semibold" style={{ background: 'var(--green)', color: '#fff' }}>
               {c.f1}
             </Link>
@@ -181,7 +207,7 @@ export default function Landing() {
       <AnimatedSection>
         <div className="py-12" style={{ borderTop: '0.5px solid var(--border)', borderBottom: '0.5px solid var(--border)' }}>
           <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {[['500+','Active Resellers'],['10K+','Orders'],['98%','Response Rate'],['3x','More Sales']].map(([v,l], i) => (
+            {c.stats.map(([v,l]: [string,string], i: number) => (
               <div key={l} className="animate-fade-in-up">
                 <p className="brand font-extrabold text-4xl gradient-text-green">{v}</p>
                 <p className="text-xs mt-1 font-medium" style={{ color: 'var(--text3)' }}>{l}</p>
@@ -195,12 +221,12 @@ export default function Landing() {
       <AnimatedSection>
         <section className="py-20 px-4 max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <div className="badge badge-green mb-4 inline-flex">Features</div>
-            <h2 className="brand font-bold text-3xl md:text-5xl mb-3" style={{ color: 'var(--text)' }}>Sab kuch ek jagah</h2>
-            <p className="text-sm" style={{ color: 'var(--text3)' }}>Jo bhi chahiye — sab hai</p>
+            <div className="badge badge-green mb-4 inline-flex">{c.feat_head}</div>
+            <h2 className="brand font-bold text-3xl md:text-5xl mb-3" style={{ color: 'var(--text)' }}>{c.feat_head}</h2>
+            <p className="text-sm" style={{ color: 'var(--text3)' }}>{c.feat_sub}</p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {c.features.map((f, i) => (
+            {c.features.map((f: any, i: number) => (
               <div key={i} className="card p-6 group hover:-translate-y-1 animate-fade-in-up"
                 style={{ animationDelay: `${i * 0.08}s` }}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110"
@@ -220,19 +246,19 @@ export default function Landing() {
         <section className="py-20 px-4" style={{ background: 'var(--bg2)' }}>
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <div className="badge badge-green mb-4 inline-flex">Pricing</div>
-              <h2 className="brand font-bold text-3xl md:text-5xl mb-3" style={{ color: 'var(--text)' }}>Pricing — PKR</h2>
-              <p className="text-sm mb-6" style={{ color: 'var(--text3)' }}>Koi risk nahi — free trial se start karo</p>
+              <div className="badge badge-green mb-4 inline-flex">{c.price_head}</div>
+              <h2 className="brand font-bold text-3xl md:text-5xl mb-3" style={{ color: 'var(--text)' }}>{c.price_head}</h2>
+              <p className="text-sm mb-6" style={{ color: 'var(--text3)' }}>{c.price_sub}</p>
               <div className="flex items-center justify-center gap-3">
-                <span className="text-sm font-medium" style={{ color: yearly ? 'var(--text3)' : 'var(--text)' }}>Monthly</span>
+                <span className="text-sm font-medium" style={{ color: yearly ? 'var(--text3)' : 'var(--text)' }}>{c.monthly}</span>
                 <div onClick={() => setYearly(!yearly)} className={`toggle ${yearly ? 'on' : 'off'}`}><div className="knob" /></div>
                 <span className="text-sm font-medium" style={{ color: yearly ? 'var(--text)' : 'var(--text3)' }}>
-                  Yearly <span className="badge badge-green text-[10px] ml-1">Save 20%</span>
+                  {c.yearly} <span className="badge badge-green text-[10px] ml-1">{c.save}</span>
                 </span>
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-5">
-              {c.plans.map((p, i) => (
+              {c.plans.map((p: any, i: number) => (
                 <div key={i} className="relative rounded-2xl p-6 animate-fade-in-up transition-all duration-300 hover:-translate-y-1"
                   style={{
                     animationDelay: `${i * 0.1}s`,
@@ -242,7 +268,7 @@ export default function Landing() {
                   }}>
                   {p.hot && (
                     <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="badge badge-green text-xs px-4 py-1"><Star size={10} /> Most Popular</span>
+                      <span className="badge badge-green text-xs px-4 py-1"><Star size={10} /> {c.popular}</span>
                     </div>
                   )}
                   <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text)' }}>{p.name}</h3>
@@ -251,11 +277,11 @@ export default function Landing() {
                       Rs.{yearly ? parseInt(p.price.replace(/,/g,'')) * 10 : p.price}
                     </span>
                     <span className="text-xs mb-1.5" style={{ color: 'var(--text3)' }}>
-                      {yearly ? '/year' : p.per}
+                      {yearly ? c.per_year : p.per}
                     </span>
                   </div>
                   <ul className="space-y-3 mb-6">
-                    {p.f.map((ft, j) => (
+                    {p.f.map((ft: string, j: number) => (
                       <li key={j} className="flex items-center gap-2.5 text-sm" style={{ color: 'var(--text2)' }}>
                         <Check size={14} strokeWidth={2.5} style={{ color: 'var(--green)', flexShrink: 0 }} />{ft}
                       </li>
@@ -283,13 +309,13 @@ export default function Landing() {
             WA<span className="gradient-text-green">SHOP</span>
           </span>
         </div>
-        <p className="text-xs" style={{ color: 'var(--text3)' }}>Pakistan ka pehla AI WhatsApp reseller platform. © 2025</p>
+        <p className="text-xs" style={{ color: 'var(--text3)' }}>{c.copyright}</p>
         <div className="flex items-center justify-center gap-4 mt-4">
-          <Link href="/auth/login" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>Login</Link>
+          <Link href="/auth/login" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>{c.login}</Link>
           <span style={{ color: 'var(--border2)' }}>·</span>
-          <Link href="/auth/register" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>Register</Link>
+          <Link href="/auth/register" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>{c.register}</Link>
           <span style={{ color: 'var(--border2)' }}>·</span>
-          <Link href="/privacy" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>Privacy</Link>
+          <Link href="/privacy" className="text-xs transition-colors hover:opacity-70" style={{ color: 'var(--text3)' }}>{c.privacy}</Link>
         </div>
       </footer>
     </div>

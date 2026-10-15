@@ -43,6 +43,14 @@ export const translations: Record<string, Record<string, string>> = {
   auth_has_account: { en: 'Already have an account?', ur: 'پہلے سے اکاؤنٹ ہے؟', roman_ur: 'Pehle se account hai?' },
   auth_register_link: { en: 'Register here', ur: 'رجسٹر کریں', roman_ur: 'Register karein' },
   auth_login_link: { en: 'Login here', ur: 'لاگ ان کریں', roman_ur: 'Login karein' },
+  auth_welcome_back: { en: 'Welcome Back!', ur: 'خوش آمدید!', roman_ur: 'Wapas Aajayein!' },
+  auth_welcome_sub: { en: 'Manage your WhatsApp business with AI', ur: 'اپنا واٹس ایپ بزنس AI کے ساتھ چلائیں', roman_ur: 'Apne WhatsApp business ko AI ke sath manage karein' },
+  auth_login_cta: { en: 'Login', ur: 'لاگ ان کریں', roman_ur: 'Login' },
+  auth_login_failed: { en: 'Login failed', ur: 'لاگ ان نہیں ہوا', roman_ur: 'Login nahi hua' },
+  auth_create_cta: { en: 'Create Account', ur: 'اکاؤنٹ بنائیں', roman_ur: 'Account Banayein' },
+  auth_register_failed: { en: 'Registration failed', ur: 'رجسٹریشن نہیں ہوئی', roman_ur: 'Registration nahi hui' },
+  auth_join: { en: 'Join Thousands of Sellers', ur: 'ہزاروں سیلرز میں شامل ہوں', roman_ur: 'Hazaaron sellers mein shaamil hon' },
+  auth_join_sub: { en: 'Start your AI-powered WhatsApp shop today', ur: 'آج ہی اپنی AI واٹس ایپ دکان شروع کریں', roman_ur: 'Aaj apni AI WhatsApp dukaan shuru karein' },
 
   // ── Admin ───────────────────────────────────────────────────────────────────
   admin_title: { en: 'Admin', ur: 'ایڈمن', roman_ur: 'Admin' },
@@ -76,6 +84,15 @@ export const translations: Record<string, Record<string, string>> = {
   prod_active: { en: 'Active', ur: 'فعال', roman_ur: 'Active' },
   prod_hidden: { en: 'Hidden', ur: 'پوشیدہ', roman_ur: 'Hidden' },
   prod_save: { en: 'Save', ur: 'محفوظ کریں', roman_ur: 'Save' },
+  prod_update: { en: 'Update', ur: 'اپ ڈیٹ کریں', roman_ur: 'Update' },
+  prod_add_photo: { en: 'Add photo', ur: 'تصویر شامل کریں', roman_ur: 'Photo add karein' },
+  prod_include_status: { en: 'Include in daily status', ur: 'روزانہ اسٹیٹس میں شامل کریں', roman_ur: 'Rozana status mein shaamil karein' },
+  prod_include_status_sub: { en: 'Auto-post to WhatsApp status', ur: 'واٹس ایپ اسٹیٹس پر خودکار پوسٹ', roman_ur: 'WhatsApp status par auto-post' },
+  prod_floor_tip: { en: 'Minimum price — AI never reveals this to customers', ur: 'کم سے کم قیمت — AI یہ گاہک کو کبھی نہیں بتاتا', roman_ur: 'Minimum price — AI ye customer ko kabhi nahi batata' },
+  prod_floor_label: { en: 'Floor', ur: 'فلور', roman_ur: 'Floor' },
+  prod_left: { en: 'left', ur: 'باقی', roman_ur: 'baqi' },
+  prod_out_of_stock: { en: 'Out of stock', ur: 'اسٹاک ختم', roman_ur: 'Stock khatam' },
+  common_delete_confirm: { en: 'Delete this?', ur: 'حذف کریں؟', roman_ur: 'Delete karein?' },
 
   // ── Orders ──────────────────────────────────────────────────────────────────
   order_title: { en: 'Orders', ur: 'آرڈرز', roman_ur: 'Orders' },
@@ -88,6 +105,9 @@ export const translations: Record<string, Record<string, string>> = {
   order_delivered: { en: 'Delivered', ur: 'ڈلیورڈ', roman_ur: 'Delivered' },
   order_cancelled: { en: 'Cancelled', ur: 'منسوخ', roman_ur: 'Cancelled' },
   order_status: { en: 'Status', ur: 'اسٹیٹس', roman_ur: 'Status' },
+  order_cancel: { en: 'Cancel', ur: 'منسوخ کریں', roman_ur: 'Cancel' },
+  order_view_location: { en: 'View location', ur: 'لوکیشن دیکھیں', roman_ur: 'Location dekhein' },
+  common_unknown: { en: 'Unknown', ur: 'نامعلوم', roman_ur: 'Unknown' },
 
   // ── Chats ───────────────────────────────────────────────────────────────────
   chat_search: { en: 'Search chats...', ur: 'چیٹس تلاش کریں...', roman_ur: 'Chats dhoondein...' },
@@ -116,6 +136,10 @@ export const translations: Record<string, Record<string, string>> = {
   status_fri: { en: 'Fri', ur: 'جمعہ', roman_ur: 'Fri' },
   status_sat: { en: 'Sat', ur: 'ہفتہ', roman_ur: 'Sat' },
   status_sun: { en: 'Sun', ur: 'اتوار', roman_ur: 'Sun' },
+  status_scheduled: { en: 'Scheduled', ur: 'شیڈولڈ', roman_ur: 'Scheduled' },
+  status_at: { en: 'at', ur: 'بجے', roman_ur: 'par' },
+  status_products_word: { en: 'products', ur: 'پروڈکٹس', roman_ur: 'products' },
+  common_remove: { en: 'Remove', ur: 'ہٹائیں', roman_ur: 'Remove' },
 
   // ── Analytics ───────────────────────────────────────────────────────────────
   analytics_title: { en: 'Analytics', ur: 'تجزیہ', roman_ur: 'Analytics' },
@@ -123,16 +147,34 @@ export const translations: Record<string, Record<string, string>> = {
   analytics_total_revenue: { en: 'Total Revenue', ur: 'کل آمدنی', roman_ur: 'Total Revenue' },
   analytics_total_orders: { en: 'Total Orders', ur: 'کل آرڈرز', roman_ur: 'Total Orders' },
   analytics_summary: { en: 'Summary', ur: 'خلاصہ', roman_ur: 'Summary' },
+  analytics_total_chats: { en: 'Total Chats', ur: 'کل چیٹس', roman_ur: 'Total Chats' },
+  analytics_products: { en: 'Products', ur: 'پروڈکٹس', roman_ur: 'Products' },
+  analytics_pending_orders: { en: 'pending orders', ur: 'زیر التواء آرڈرز', roman_ur: 'pending orders' },
+  analytics_pending_sub: { en: 'Update status in the Orders page', ur: 'آرڈرز پیج میں اسٹیٹس اپ ڈیٹ کریں', roman_ur: 'Orders page mein status update karein' },
+  analytics_low_stock_products: { en: 'Low Stock Products', ur: 'کم اسٹاک پروڈکٹس', roman_ur: 'Low Stock Products' },
+  analytics_conv: { en: 'Conversion Rate', ur: 'کنورژن ریٹ', roman_ur: 'Conversion Rate' },
+  analytics_aov: { en: 'Avg Order Value', ur: 'اوسط آرڈر ویلیو', roman_ur: 'Avg Order Value' },
+  analytics_resp: { en: 'Response Time', ur: 'ریسپانس ٹائم', roman_ur: 'Response Time' },
+  analytics_ai_replies: { en: 'AI Replies', ur: 'AI جوابات', roman_ur: 'AI Replies' },
 
   // ── Settings ────────────────────────────────────────────────────────────────
   settings_title: { en: 'Settings', ur: 'سیٹنگز', roman_ur: 'Settings' },
   settings_sub: { en: 'Manage your account', ur: 'اپنا اکاؤنٹ مینیج کریں', roman_ur: 'Apna account manage karein' },
+  set_name: { en: 'Name', ur: 'نام', roman_ur: 'Name' },
+  set_phone: { en: 'Phone', ur: 'فون', roman_ur: 'Phone' },
+  set_reply_lang: { en: 'Reply language', ur: 'جواب کی زبان', roman_ur: 'Reply language' },
+  set_disconnect: { en: 'Disconnect', ur: 'منقطع کریں', roman_ur: 'Disconnect' },
+  set_save: { en: 'Save Changes', ur: 'تبدیلیاں محفوظ کریں', roman_ur: 'Save Changes' },
+  set_saved: { en: 'Saved!', ur: 'محفوظ ہوگیا!', roman_ur: 'Save hogaya!' },
 
   // ── Subscription ────────────────────────────────────────────────────────────
   sub_title: { en: 'Subscription', ur: 'سبسکرپشن', roman_ur: 'Subscription' },
   sub_sub: { en: 'Premium plans unlock all features', ur: 'پرییمیم پلانز تمام فیچرز کھول دیتے ہیں', roman_ur: 'Premium plans saare features unlock karte hain' },
   sub_current: { en: 'Current Plan', ur: 'موجودہ پلان', roman_ur: 'Current Plan' },
   sub_buy: { en: 'Buy {plan}', ur: '{plan} خریدیں', roman_ur: 'Buy {plan}' },
+  sub_processing: { en: 'Processing...', ur: 'پروسیسنگ...', roman_ur: 'Processing...' },
+  sub_payment_details: { en: 'Payment Details', ur: 'ادائیگی کی تفصیلات', roman_ur: 'Payment Details' },
+  sub_pending_orders: { en: 'Pending Orders', ur: 'زیر التواء آرڈرز', roman_ur: 'Pending Orders' },
 
   // ── Connect WA ──────────────────────────────────────────────────────────────
   connect_title: { en: 'Connect WhatsApp', ur: 'واٹس ایپ کنیکٹ کریں', roman_ur: 'Connect WhatsApp' },
@@ -173,10 +215,32 @@ export function t(key: string, lang: string = 'en', vars?: Record<string, string
   return text;
 }
 
-export function getLang(): string {
-  if (typeof window === 'undefined') return 'en';
+export type Lang = 'en' | 'roman_ur' | 'ur';
+
+export const LANGS: { code: Lang; label: string; short: string }[] = [
+  { code: 'en', label: 'English', short: 'EN' },
+  { code: 'roman_ur', label: 'Roman Urdu', short: 'RU' },
+  { code: 'ur', label: 'اردو', short: 'اردو' },
+];
+
+const LANG_KEY = 'wa_lang';
+
+export function getLang(): Lang {
+  if (typeof window === 'undefined') return 'roman_ur';
   try {
+    const v = localStorage.getItem(LANG_KEY);
+    if (v === 'en' || v === 'roman_ur' || v === 'ur') return v;
+    // migrate from older wa_user.language if present
     const u = JSON.parse(localStorage.getItem('wa_user') || '{}');
-    return u.language || 'en';
-  } catch { return 'en'; }
+    if (u.language === 'en' || u.language === 'roman_ur' || u.language === 'ur') return u.language;
+  } catch {}
+  return 'roman_ur';
+}
+
+export function setLangStore(l: Lang) {
+  try { localStorage.setItem(LANG_KEY, l); } catch {}
+}
+
+export function getDir(l: string): 'rtl' | 'ltr' {
+  return l === 'ur' ? 'rtl' : 'ltr';
 }

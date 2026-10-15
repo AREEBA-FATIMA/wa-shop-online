@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell } from 'lucide-react';
 import api, { removeToken, getToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
-import { LangProvider, useT } from '@/contexts/LangContext';
+import { useT } from '@/contexts/LangContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const path = usePathname();
@@ -162,6 +163,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
         {/* Footer */}
         <div className="p-3 space-y-1.5" style={{ borderTop: '0.5px solid var(--border)' }}>
+          <div className="flex justify-center pb-1"><LanguageSwitcher /></div>
           <Link href="/connect-wa"
             className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all"
             style={{
@@ -230,9 +232,5 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <LangProvider>
-      <DashboardContent>{children}</DashboardContent>
-    </LangProvider>
-  );
+  return <DashboardContent>{children}</DashboardContent>;
 }

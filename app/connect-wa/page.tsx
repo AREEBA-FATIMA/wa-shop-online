@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, CheckCircle2, XCircle, RefreshCw, Smartphone, QrCode, Loader2, Copy, ArrowLeft, Lock, Shield, AlertTriangle } from 'lucide-react';
 import { getToken } from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 
 type ConnectStatus = 'idle' | 'loading' | 'qr' | 'authenticated' | 'ready' | 'error';
 
@@ -10,6 +11,7 @@ const WA_URL = process.env.NEXT_PUBLIC_WA_URL || process.env.NEXT_PUBLIC_API_URL
 const waAuth = (): Record<string, string> => { const t = getToken(); return t ? { Authorization: `Bearer ${t}` } : {}; };
 
 export default function ConnectWA() {
+  const { t } = useT();
   const router = useRouter();
   const [method, setMethod] = useState<'qr' | 'phone'>('phone');
   const [status, setStatus] = useState<ConnectStatus>('idle');
@@ -200,7 +202,7 @@ export default function ConnectWA() {
         <button onClick={() => router.push('/dashboard')} className="p-2 -ml-2" style={{ color: 'var(--text2)' }}>
           <ArrowLeft size={20} />
         </button>
-        <span className="brand font-bold text-sm ml-2" style={{ color: 'var(--text)' }}>Connect WhatsApp</span>
+        <span className="brand font-bold text-sm ml-2" style={{ color: 'var(--text)' }}>{t('connect_title')}</span>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-6">
@@ -209,7 +211,7 @@ export default function ConnectWA() {
             style={{ background: 'linear-gradient(135deg, var(--green), var(--green-light))', boxShadow: '0 8px 32px rgba(37,211,102,0.3)' }}>
             <MessageCircle size={28} className="text-white" />
           </div>
-          <h1 className="font-bold text-xl mb-1" style={{ color: 'var(--text)' }}>WhatsApp Connect</h1>
+          <h1 className="font-bold text-xl mb-1" style={{ color: 'var(--text)' }}>{t('connect_title')}</h1>
           <p className="text-xs mb-6" style={{ color: 'var(--text3)' }}>Apna tarika chunein</p>
 
           {/* Tabs */}
@@ -223,7 +225,7 @@ export default function ConnectWA() {
                   color: method === 'phone' ? '#fff' : 'var(--text2)',
                   boxShadow: method === 'phone' ? '0 2px 8px rgba(37,211,102,0.3)' : 'none',
                 }}>
-                <Smartphone size={15} /> Phone
+                <Smartphone size={15} /> {t('connect_phone')}
               </button>
               <button onClick={() => { setMethod('qr'); reset(); }}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200"
@@ -232,7 +234,7 @@ export default function ConnectWA() {
                   color: method === 'qr' ? '#fff' : 'var(--text2)',
                   boxShadow: method === 'qr' ? '0 2px 8px rgba(37,211,102,0.3)' : 'none',
                 }}>
-                <QrCode size={15} /> QR Code
+                <QrCode size={15} /> {t('connect_qr')}
               </button>
             </div>
           )}
@@ -431,7 +433,7 @@ export default function ConnectWA() {
           <button onClick={() => router.push('/dashboard')}
             className="mt-5 text-xs transition-colors hover:opacity-70"
             style={{ color: 'var(--text3)' }}>
-            Skip — baad mein connect karna hai
+            {t('connect_skip')}
           </button>
 
           {/* Security notice */}

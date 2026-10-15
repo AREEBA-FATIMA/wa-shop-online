@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 import { ShoppingBag, MessageCircle, Package, TrendingUp, ArrowRight, DollarSign, Clock, AlertTriangle, Users, Sparkles } from 'lucide-react';
+import { useT } from '@/contexts/LangContext';
 
 export default function DashboardHome() {
+  const { t } = useT();
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -15,10 +17,10 @@ export default function DashboardHome() {
   }, []);
 
   const cards = stats ? [
-    { label: "Today's Orders", value: stats.today_orders ?? 0, icon: ShoppingBag, color: '#a855f7', bg: 'rgba(168,85,247,0.12)', trend: '+12%' },
-    { label: "Today's Revenue", value: `Rs.${(stats.today_revenue ?? 0).toLocaleString()}`, icon: DollarSign, color: '#25D366', bg: 'rgba(37,211,102,0.12)', trend: '+8%' },
-    { label: 'Active Chats', value: stats.total_chats ?? 0, icon: MessageCircle, color: '#f472b6', bg: 'rgba(244,114,182,0.12)', trend: '+5%' },
-    { label: 'Products', value: stats.total_products ?? 0, icon: Package, color: '#22d3ee', bg: 'rgba(34,211,238,0.12)', trend: '' },
+    { label: t('dash_today_orders'), value: stats.today_orders ?? 0, icon: ShoppingBag, color: 'var(--teal)', bg: 'var(--green-dim)' },
+    { label: t('dash_today_revenue'), value: `Rs.${(stats.today_revenue ?? 0).toLocaleString()}`, icon: DollarSign, color: 'var(--green)', bg: 'var(--green-dim)' },
+    { label: t('dash_active_chats'), value: stats.total_chats ?? 0, icon: MessageCircle, color: 'var(--blue)', bg: 'rgba(2,126,181,0.12)' },
+    { label: t('dash_products'), value: stats.total_products ?? 0, icon: Package, color: 'var(--amber)', bg: 'rgba(196,130,14,0.12)' },
   ] : [];
 
   return (
@@ -27,7 +29,7 @@ export default function DashboardHome() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>
-            {userName ? `Assalam-o-Alaikum, ${userName.split(' ')[0]}!` : 'Dashboard'}
+            {userName ? t('dash_greeting', { name: userName.split(' ')[0] }) : t('dash_title')}
           </h1>
           <p className="text-sm mt-0.5" style={{ color: 'var(--text3)' }}>
             {new Date().toLocaleDateString('en-PK', { weekday: 'long', day: 'numeric', month: 'long' })}
@@ -51,7 +53,6 @@ export default function DashboardHome() {
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: c.bg }}>
                   <c.icon size={18} style={{ color: c.color }} />
                 </div>
-                {c.trend && <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: c.bg, color: c.color }}>{c.trend}</span>}
               </div>
               <p className="brand font-bold text-xl" style={{ color: 'var(--text)' }}>{c.value}</p>
               <p className="text-xs mt-0.5" style={{ color: 'var(--text3)' }}>{c.label}</p>
@@ -67,7 +68,7 @@ export default function DashboardHome() {
             <AlertTriangle size={16} style={{ color: '#e8a030' }} />
           </span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold mb-2" style={{ color: '#e8a030' }}>Low Stock Alert</p>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#e8a030' }}>{t('dash_low_stock')}</p>
             <div className="flex flex-wrap gap-1.5">
               {stats.low_stock.map((p: any, i: number) => (
                 <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ background: 'rgba(234,160,30,0.12)', color: '#e8a030', border: '0.5px solid rgba(234,160,30,0.2)' }}>
@@ -81,15 +82,15 @@ export default function DashboardHome() {
 
       {/* Quick actions */}
       <div>
-        <p className="text-[10px] font-semibold tracking-widest uppercase mb-3" style={{ color: 'var(--text3)' }}>Quick Actions</p>
+        <p className="text-[10px] font-semibold tracking-widest uppercase mb-3" style={{ color: 'var(--text3)' }}>{t('dash_quick_actions')}</p>
         <div className="grid grid-cols-3 gap-3">
           {[
-            { href: '/dashboard/chats', icon: MessageCircle, label: 'Chats', color: '#25D366' },
-            { href: '/dashboard/products', icon: Package, label: 'Products', color: '#22d3ee' },
-            { href: '/dashboard/orders', icon: ShoppingBag, label: 'Orders', color: '#a855f7' },
+            { href: '/dashboard/chats', icon: MessageCircle, label: t('nav_chats'), color: 'var(--green)' },
+            { href: '/dashboard/products', icon: Package, label: t('nav_products'), color: 'var(--blue)' },
+            { href: '/dashboard/orders', icon: ShoppingBag, label: t('nav_orders'), color: 'var(--teal)' },
           ].map(a => (
             <Link key={a.href} href={a.href} className="rounded-2xl p-4 text-center transition-all hover:scale-[1.02] active:scale-[0.98]" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
-              <span className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2" style={{ background: a.color + '18' }}>
+              <span className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-2" style={{ background: 'var(--green-dim)' }}>
                 <a.icon size={18} style={{ color: a.color }} />
               </span>
               <p className="text-xs font-medium" style={{ color: 'var(--text)' }}>{a.label}</p>
@@ -101,7 +102,7 @@ export default function DashboardHome() {
       {/* Recent activity placeholder */}
       <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>Recent Activity</p>
+          <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>{t('dash_recent')}</p>
           <Clock size={14} style={{ color: 'var(--text3)' }} />
         </div>
         <div className="space-y-3">

@@ -1,12 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 import { Radio, Send, Loader2, Calendar, Settings2, Hash, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_KEYS = ['status_mon','status_tue','status_wed','status_thu','status_fri','status_sat','status_sun'];
 
 export default function StatusPage() {
+  const { t } = useT();
   const [count, setCount] = useState(5);
   const [postTime, setPostTime] = useState('09:00');
   const [days, setDays] = useState([1, 2, 3, 4, 5, 6, 7]);
@@ -69,12 +72,12 @@ export default function StatusPage() {
           <Radio size={18} style={{ color: 'var(--green)' }} />
         </span>
         <div className="flex-1">
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Status</h1>
-          <p className="text-sm" style={{ color: 'var(--text3)' }}>Rozana stock mein se products ki status auto-post karein</p>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('status_title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('status_sub')}</p>
         </div>
         {!waConnected && (
           <Link href="/connect-wa" className="text-xs font-medium px-3 py-1.5 rounded-full shrink-0" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}>
-            Connect WA
+            {t('wa_disconnected')}
           </Link>
         )}
       </div>
@@ -82,7 +85,7 @@ export default function StatusPage() {
       <div className="space-y-4">
         <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
-            <Hash size={14} />Products per day
+            <Hash size={14} />{t('status_products_per_day')}
           </h2>
           <p className="text-xs mb-3" style={{ color: 'var(--text3)' }}>Har roz stock mein se itne products random select honge aur alag status story lage gi</p>
           <input type="number" min={1} max={50} value={count} onChange={e => setCount(Math.max(1, parseInt(e.target.value) || 1))}
@@ -91,19 +94,19 @@ export default function StatusPage() {
 
         <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
-            <Calendar size={14} />Auto Schedule
+            <Calendar size={14} />{t('status_auto_schedule')}
           </h2>
           <div className="mb-3">
-            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>Post time</label>
+            <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t('status_post_time')}</label>
             <input type="time" value={postTime} onChange={e => setPostTime(e.target.value)} className="field" />
           </div>
-          <label className="text-xs font-medium mb-2 block" style={{ color: 'var(--text3)' }}>Days</label>
+          <label className="text-xs font-medium mb-2 block" style={{ color: 'var(--text3)' }}>{t('status_days')}</label>
           <div className="flex gap-1.5 flex-wrap">
             {DAYS.map((d, i) => (
               <button key={d} onClick={() => toggleDay(i + 1)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
                 style={{ background: days.includes(i + 1) ? 'var(--green)' : 'var(--bg3)', color: days.includes(i + 1) ? '#fff' : 'var(--text2)' }}>
-                {d}
+                {t(DAY_KEYS[i])}
               </button>
             ))}
           </div>
@@ -114,9 +117,9 @@ export default function StatusPage() {
           <div className="rounded-2xl p-3 flex items-center gap-2 animate-fade-in" style={{ background: 'var(--green-dim)', border: '0.5px solid rgba(37,211,102,0.3)' }}>
             <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ background: 'var(--green)' }} />
             <p className="text-xs font-medium" style={{ color: 'var(--green)' }}>
-              Scheduled: {DAYS.filter((_, i) => days.includes(i + 1)).join(', ')} at {postTime} — {count} products
+              {t('status_scheduled')}: {DAY_KEYS.filter((_, i) => days.includes(i + 1)).map(k => t(k)).join(', ')} {t('status_at')} {postTime} — {count} {t('status_products_word')}
             </p>
-            <button onClick={removeSchedule} disabled={sending} className="ml-auto text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}><Trash2 size={11} className="inline" /> Remove</button>
+            <button onClick={removeSchedule} disabled={sending} className="ml-auto text-xs px-2 py-1 rounded-lg" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}><Trash2 size={11} className="inline" /> {t('common_remove')}</button>
           </div>
         )}
 
@@ -124,11 +127,11 @@ export default function StatusPage() {
           <button onClick={postNow} disabled={sending || !waConnected}
             className="btn-primary flex-1 justify-center text-sm" style={{ opacity: sending || !waConnected ? 0.5 : 1 }}>
             {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-            Post Now
+            {t('status_post_now')}
           </button>
           <button onClick={saveSchedule} disabled={sending}
             className="btn-ghost flex-1 justify-center text-sm" style={{ opacity: sending ? 0.5 : 1 }}>
-            <Settings2 size={14} /> Schedule
+            <Settings2 size={14} /> {t('status_schedule')}
           </button>
         </div>
 

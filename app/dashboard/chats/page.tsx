@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 import { Send, Bot, User2, Search, RefreshCw, MessageCircle, Trash2, Phone, MoreVertical, Check, CheckCheck } from 'lucide-react';
 
 interface Chat { id: string; customer_phone: string; customer_name: string; last_message: string; last_message_at: string; unread_count: number; status: string; }
@@ -23,6 +24,7 @@ function formatTime(iso: string) {
 }
 
 export default function ChatsPage() {
+  const { t } = useT();
   const [chats, setChats] = useState<Chat[]>([]);
   const [active, setActive] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,7 +42,7 @@ export default function ChatsPage() {
 
   async function deleteChat(chatId: string, e: React.MouseEvent) {
     e.stopPropagation();
-    if (!confirm('Delete this chat?')) return;
+    if (!confirm(t('common_delete_confirm'))) return;
     try { await api.delete(`/api/chats/${chatId}`); setChats(prev => prev.filter(c => c.id !== chatId)); if (active?.id === chatId) { setActive(null); setMessages([]); } } catch {}
   }
 
@@ -94,7 +96,7 @@ export default function ChatsPage() {
         <div className="p-3" style={{ borderBottom: '0.5px solid var(--border)' }}>
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search chats..." className="w-full bg-[var(--bg3)] border-none rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" style={{ color: 'var(--text)' }} />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('chat_search')} className="w-full bg-[var(--bg3)] border-none rounded-xl pl-9 pr-3 py-2.5 text-sm outline-none" style={{ color: 'var(--text)' }} />
           </div>
         </div>
 
@@ -105,7 +107,7 @@ export default function ChatsPage() {
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-8 text-center">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'var(--bg3)' }}><MessageCircle size={24} style={{ color: 'var(--text3)' }} /></div>
-              <p className="text-sm font-medium" style={{ color: 'var(--text3)' }}>No chats yet</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--text3)' }}>{t('chat_no_chats')}</p>
               <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Messages from customers will appear here</p>
             </div>
           ) : (
@@ -120,7 +122,7 @@ export default function ChatsPage() {
                     <span className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{chat.customer_name || chat.customer_phone}</span>
                     <span className="text-[10px] shrink-0 ml-2" style={{ color: 'var(--text3)' }}>{timeAgo(chat.last_message_at)}</span>
                   </div>
-                  <p className="text-xs truncate" style={{ color: 'var(--text3)' }}>{chat.last_message || 'No messages yet'}</p>
+                  <p className="text-xs truncate" style={{ color: 'var(--text3)' }}>{chat.last_message || t('chat_no_messages')}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                   {chat.unread_count > 0 && (
@@ -170,7 +172,7 @@ export default function ChatsPage() {
               {messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background: 'var(--bg3)' }}><MessageCircle size={20} style={{ color: 'var(--text3)' }} /></div>
-                  <p className="text-sm" style={{ color: 'var(--text3)' }}>No messages yet</p>
+                  <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('chat_no_messages')}</p>
                   <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>Send a message to start the conversation</p>
                 </div>
               ) : (
@@ -212,13 +214,13 @@ export default function ChatsPage() {
               <div className="mx-3 mb-2 rounded-2xl p-3 animate-slide-up" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)', boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}>
                 <div className="flex items-center gap-1.5 mb-2">
                   <span className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: 'var(--green-dim)' }}><Bot size={10} style={{ color: 'var(--green)' }} /></span>
-                  <span className="text-[11px] font-semibold" style={{ color: 'var(--green)' }}>AI Suggestion</span>
+                  <span className="text-[11px] font-semibold" style={{ color: 'var(--green)' }}>{t('chat_ai_suggestion')}</span>
                 </div>
                 <p className="text-sm mb-2.5" style={{ color: 'var(--text)' }}>{aiSuggestion}</p>
                 <div className="flex gap-2">
-                  <button onClick={() => sendReply(aiSuggestion)} className="text-xs font-semibold px-4 py-1.5 rounded-lg transition-all" style={{ background: 'var(--green)', color: '#fff' }}>Send</button>
-                  <button onClick={() => { setReplyText(aiSuggestion); setAiSuggestion(''); }} className="text-xs font-medium px-4 py-1.5 rounded-lg transition-all" style={{ background: 'var(--bg3)', color: 'var(--text2)' }}>Edit</button>
-                  <button onClick={() => setAiSuggestion('')} className="text-xs px-2 py-1.5 rounded-lg transition-all" style={{ color: 'var(--text3)' }}>Dismiss</button>
+                  <button onClick={() => sendReply(aiSuggestion)} className="text-xs font-semibold px-4 py-1.5 rounded-lg transition-all" style={{ background: 'var(--green)', color: '#fff' }}>{t('chat_send')}</button>
+                  <button onClick={() => { setReplyText(aiSuggestion); setAiSuggestion(''); }} className="text-xs font-medium px-4 py-1.5 rounded-lg transition-all" style={{ background: 'var(--bg3)', color: 'var(--text2)' }}>{t('chat_edit')}</button>
+                  <button onClick={() => setAiSuggestion('')} className="text-xs px-2 py-1.5 rounded-lg transition-all" style={{ color: 'var(--text3)' }}>{t('chat_dismiss')}</button>
                 </div>
               </div>
             )}
@@ -226,7 +228,7 @@ export default function ChatsPage() {
             {/* Input */}
             <div className="px-3 py-3" style={{ background: 'var(--bg2)', borderTop: '0.5px solid var(--border)' }}>
               <div className="flex items-center gap-2 rounded-2xl px-4 py-1" style={{ background: 'var(--bg3)' }}>
-                <input value={replyText} onChange={e => setReplyText(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendReply()} placeholder="Type a message..." className="flex-1 bg-transparent border-none outline-none text-sm py-2.5" style={{ color: 'var(--text)' }} />
+                <input value={replyText} onChange={e => setReplyText(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendReply()} placeholder={t('chat_placeholder')} className="flex-1 bg-transparent border-none outline-none text-sm py-2.5" style={{ color: 'var(--text)' }} />
                 <button onClick={() => sendReply()} disabled={sending || !replyText.trim()} className="w-9 h-9 rounded-xl flex items-center justify-center transition-all shrink-0" style={{ background: replyText.trim() ? 'var(--green)' : 'var(--bg4)', color: replyText.trim() ? '#fff' : 'var(--text3)' }}>
                   <Send size={15} />
                 </button>

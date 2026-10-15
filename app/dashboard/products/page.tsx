@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
 import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera, Grid3X3, List, Image as ImageIcon, DollarSign, Hash } from 'lucide-react';
+import { useT } from '@/contexts/LangContext';
 
 interface Product {
   id: string; name: string; description: string; price: number;
@@ -16,6 +17,7 @@ const EMPTY: Omit<Product, 'id'> = {
 };
 
 export default function ProductsPage() {
+  const { t } = useT();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -46,7 +48,7 @@ export default function ProductsPage() {
     setSaving(false);
   }
 
-  async function del(id: string) { if (!confirm('Delete this product?')) return; try { await api.delete(`/api/products/${id}`); await load(); } catch {} }
+  async function del(id: string) { if (!confirm(t('common_delete_confirm'))) return; try { await api.delete(`/api/products/${id}`); await load(); } catch {} }
   function upd(k: string, v: any) { setForm(f => ({ ...f, [k]: v })); }
 
   // Downscale + compress in the browser so uploads are small and reliable
@@ -99,7 +101,7 @@ export default function ProductsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Products</h1>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('prod_title')}</h1>
           <p className="text-sm" style={{ color: 'var(--text3)' }}>{products.length} products</p>
         </div>
         <div className="flex items-center gap-2">
@@ -120,9 +122,9 @@ export default function ProductsPage() {
           <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4" style={{ background: 'var(--bg3)' }}>
             <Package size={32} style={{ color: 'var(--text3)' }} />
           </div>
-          <p className="font-semibold mb-1" style={{ color: 'var(--text3)' }}>No products yet</p>
-          <p className="text-sm mb-5" style={{ color: 'var(--text3)' }}>Add your first product to get started</p>
-          <button onClick={openAdd} className="btn-primary text-sm">Add Product</button>
+          <p className="font-semibold mb-1" style={{ color: 'var(--text3)' }}>{t('prod_no_products')}</p>
+          <p className="text-sm mb-5" style={{ color: 'var(--text3)' }}>{t('prod_no_products_sub')}</p>
+          <button onClick={openAdd} className="btn-primary text-sm">{t('prod_add')}</button>
         </div>
       ) : view === 'grid' ? (
         /* ─── Grid View ─── */
@@ -139,7 +141,7 @@ export default function ProductsPage() {
                 {/* Badge */}
                 <span className={`absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full`}
                   style={p.include_in_status ? { background: 'rgba(37,211,102,0.9)', color: '#fff' } : { background: 'rgba(0,0,0,0.4)', color: '#fff' }}>
-                  {p.include_in_status ? 'Active' : 'Hidden'}
+                  {p.include_in_status ? t('prod_active') : t('prod_hidden')}
                 </span>
                 {/* Edit button overlay */}
                 <button onClick={() => openEdit(p)} className="absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110"
@@ -155,8 +157,8 @@ export default function ProductsPage() {
                     {p.discount_price && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} left{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
-                    {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>Floor: Rs.{p.floor_price}</p>}
+                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} {t('prod_left')}{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
+                    {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>{t('prod_floor_label')}: Rs.{p.floor_price}</p>}
                   </div>
                 </div>
                 {p.category && (
@@ -178,11 +180,11 @@ export default function ProductsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{p.name}</p>
-                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} left{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
+                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} {t('prod_left')}{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full`}
                 style={p.include_in_status ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'var(--bg3)', color: 'var(--text3)' }}>
-                {p.include_in_status ? 'Active' : 'Hidden'}
+                {p.include_in_status ? t('prod_active') : t('prod_hidden')}
               </span>
               <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg transition-all hover:opacity-70" style={{ color: 'var(--text3)' }}><Edit2 size={13} /></button>
               <button onClick={() => del(p.id)} className="p-1.5 rounded-lg transition-all hover:opacity-70" style={{ color: '#e05a5a' }}><Trash2 size={13} /></button>
@@ -207,14 +209,14 @@ export default function ProductsPage() {
             <div className="w-10 h-1 rounded-full mx-auto mt-3 mb-1" style={{ background: 'var(--bg4)' }} />
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '0.5px solid var(--border)' }}>
-              <h2 className="font-bold text-base" style={{ color: 'var(--text)' }}>{editing ? 'Edit Product' : 'New Product'}</h2>
+              <h2 className="font-bold text-base" style={{ color: 'var(--text)' }}>{editing ? t('prod_edit') : t('prod_new')}</h2>
               <button onClick={() => setSheetOpen(false)} className="p-1.5 rounded-xl transition-all hover:opacity-70" style={{ color: 'var(--text3)' }}><X size={18} /></button>
             </div>
             {/* Form */}
             <div className="p-5 space-y-4">
               {/* Image */}
               <div>
-                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--text3)' }}>Product Image</label>
+                <label className="text-xs font-medium mb-1.5 block" style={{ color: 'var(--text3)' }}>{t('prod_image')}</label>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImagePick} />
                 {imgPreview ? (
                   <div className="relative rounded-2xl overflow-hidden mb-2">
@@ -226,22 +228,22 @@ export default function ProductsPage() {
                 ) : (
                   <button onClick={() => fileInputRef.current?.click()} className="w-full h-24 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 transition-all hover:opacity-70" style={{ borderColor: 'var(--border)', color: 'var(--text3)' }}>
                     <Camera size={20} />
-                    <span className="text-xs">Add photo</span>
+                    <span className="text-xs">{t('prod_add_photo')}</span>
                   </button>
                 )}
               </div>
               {/* Fields */}
               {[
-                { label: 'Product Name', key: 'name', type: 'text', icon: Package },
-                { label: 'Description', key: 'description', type: 'text', icon: null },
-                { label: 'Price (Rs.)', key: 'price', type: 'number', icon: DollarSign },
-                { label: 'Sale Price (Rs.)', key: 'discount_price', type: 'number', icon: null },
-                { label: 'Floor Price (Rs.)', key: 'floor_price', type: 'number', icon: null, tip: 'Minimum price — AI never reveals this to customers' },
-                { label: 'Stock', key: 'stock', type: 'number', icon: Hash },
-                { label: 'Category', key: 'category', type: 'text', icon: null },
+                { label: 'prod_name', key: 'name', type: 'text', icon: Package },
+                { label: 'prod_description', key: 'description', type: 'text', icon: null },
+                { label: 'prod_price', key: 'price', type: 'number', icon: DollarSign },
+                { label: 'prod_sale_price', key: 'discount_price', type: 'number', icon: null },
+                { label: 'prod_floor_price', key: 'floor_price', type: 'number', icon: null, tip: 'prod_floor_tip' },
+                { label: 'prod_stock', key: 'stock', type: 'number', icon: Hash },
+                { label: 'prod_category', key: 'category', type: 'text', icon: null },
               ].map(f => (
                 <div key={f.key}>
-                  <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{f.label}</label>
+                  <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t(f.label)}</label>
                   <div className="relative">
                     {f.icon && (
                       <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }}>
@@ -249,23 +251,23 @@ export default function ProductsPage() {
                       </span>
                     )}
                     <input type={f.type} value={(form as any)[f.key] ?? ''} onChange={e => upd(f.key, f.type === 'number' ? (e.target.value ? parseFloat(e.target.value) : null) : e.target.value)}
-                      placeholder={f.label} className="field" style={f.icon ? { paddingLeft: '36px' } : {}} />
+                      placeholder={t(f.label)} className="field" style={f.icon ? { paddingLeft: '36px' } : {}} />
                   </div>
-                  {f.tip && <p className="text-[11px] mt-1" style={{ color: 'var(--text3)' }}>{f.tip}</p>}
+                  {f.tip && <p className="text-[11px] mt-1" style={{ color: 'var(--text3)' }}>{t(f.tip)}</p>}
                 </div>
               ))}
               {/* Toggle */}
               <div className="flex items-center justify-between p-3 rounded-xl" style={{ background: 'var(--bg3)' }}>
                 <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>Include in daily status</p>
-                  <p className="text-xs" style={{ color: 'var(--text3)' }}>Auto-post to WhatsApp status</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{t('prod_include_status')}</p>
+                  <p className="text-xs" style={{ color: 'var(--text3)' }}>{t('prod_include_status_sub')}</p>
                 </div>
                 <div onClick={() => upd('include_in_status', !form.include_in_status)} className={`toggle ${form.include_in_status ? 'on' : 'off'}`}><div className="knob" /></div>
               </div>
               {err && <p className="text-xs text-center py-2 px-3 rounded-lg" style={{ background: 'rgba(239,68,68,0.08)', color: '#ef4444' }}>{err}</p>}
               <button onClick={save} disabled={saving} className="btn-primary w-full justify-center" style={{ opacity: saving ? 0.6 : 1 }}>
                 {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                {editing ? 'Update' : 'Add Product'}
+                {editing ? t('prod_update') : t('prod_add')}
               </button>
             </div>
           </div>

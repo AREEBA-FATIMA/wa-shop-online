@@ -1,21 +1,23 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 import { ShoppingBag, CheckCircle2, Clock, XCircle, Truck, Package, MapPin, Search } from 'lucide-react';
 
 interface Order { id: string; customer_name: string; customer_phone: string; product_name: string; amount: number; status: string; created_at: string; delivery_address?: string; }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; next: string[] }> = {
   pending:   { label: 'Pending',   color: '#e8a030', bg: 'rgba(234,160,30,0.1)', next: ['confirmed', 'cancelled'] },
-  confirmed: { label: 'Confirmed', color: '#60a5fa', bg: 'rgba(96,165,250,0.1)', next: ['shipped', 'cancelled'] },
-  shipped:   { label: 'Shipped',   color: '#a855f7', bg: 'rgba(168,85,247,0.1)', next: ['delivered', 'cancelled'] },
-  delivered: { label: 'Delivered', color: '#25D366', bg: 'rgba(37,211,102,0.1)', next: [] },
+  confirmed: { label: 'Confirmed', color: 'var(--blue)', bg: 'rgba(2,126,181,0.12)', next: ['shipped', 'cancelled'] },
+  shipped:   { label: 'Shipped',   color: 'var(--teal)', bg: 'var(--green-dim)', next: ['delivered', 'cancelled'] },
+  delivered: { label: 'Delivered', color: 'var(--green)', bg: 'var(--green-dim)', next: [] },
   cancelled: { label: 'Cancelled', color: '#e05a5a', bg: 'rgba(220,50,50,0.1)', next: [] },
 };
 
 const STATUS_FLOW = ['pending', 'confirmed', 'shipped', 'delivered'];
 
 export default function OrdersPage() {
+  const { t } = useT();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -49,7 +51,7 @@ export default function OrdersPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Orders</h1>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('order_title')}</h1>
           <p className="text-sm" style={{ color: 'var(--text3)' }}>{orders.length} total</p>
         </div>
       </div>
@@ -57,7 +59,7 @@ export default function OrdersPage() {
       {/* Search */}
       <div className="relative mb-4">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text3)' }} />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search orders..." className="field pl-9" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('order_search')} className="field pl-9" />
       </div>
 
       {/* Filter pills */}
@@ -71,7 +73,7 @@ export default function OrdersPage() {
               border: filter === k ? 'none' : `0.5px solid ${v.color}33`,
             }}>
             {k !== 'all' ? renderIcon(k) : null}
-            {v.label}
+            {k === 'all' ? t('order_all') : t('order_'+k)}
             {k !== 'all' && counts[k] ? <span className="text-[10px] opacity-70" style={{ marginLeft: 2 }}>({counts[k]})</span> : null}
           </button>
         ))}
@@ -84,7 +86,7 @@ export default function OrdersPage() {
           <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-4" style={{ background: 'var(--bg3)' }}>
             <ShoppingBag size={32} style={{ color: 'var(--text3)' }} />
           </div>
-          <p className="font-semibold" style={{ color: 'var(--text3)' }}>No orders found</p>
+          <p className="font-semibold" style={{ color: 'var(--text3)' }}>{t('order_no_orders')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -99,7 +101,7 @@ export default function OrdersPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{order.customer_name || 'Unknown'}</span>
+                        <span className="font-semibold text-sm" style={{ color: 'var(--text)' }}>{order.customer_name || t('common_unknown')}</span>
                         <span className="text-xs" style={{ color: 'var(--text3)' }}>{order.customer_phone}</span>
                       </div>
                       <p className="text-sm font-medium" style={{ color: 'var(--text2)' }}>{order.product_name}</p>
@@ -111,9 +113,9 @@ export default function OrdersPage() {
                       </div>
                       {order.delivery_address && (
                         <div className="mt-2 flex items-start gap-1.5">
-                          <MapPin size={11} className="mt-0.5 shrink-0" style={{ color: '#60a5fa' }} />
+                          <MapPin size={11} className="mt-0.5 shrink-0" style={{ color: 'var(--blue)' }} />
                           {order.delivery_address.includes('maps') || order.delivery_address.includes('goo.gl') ? (
-                            <a href={order.delivery_address} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: '#60a5fa' }}>View location</a>
+                            <a href={order.delivery_address} target="_blank" rel="noopener noreferrer" className="text-xs hover:underline" style={{ color: 'var(--blue)' }}>{t('order_view_location')}</a>
                           ) : (
                             <p className="text-xs" style={{ color: 'var(--text3)' }}>{order.delivery_address}</p>
                           )}
@@ -123,7 +125,7 @@ export default function OrdersPage() {
                     {/* Status badge + actions */}
                     <div className="shrink-0 flex flex-col items-end gap-2">
                       <span className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full" style={{ background: st.bg, color: st.color }}>
-                        {renderIcon(order.status)}{st.label}
+                        {renderIcon(order.status)}{t('order_'+order.status)}
                       </span>
                       {!isTerminal && st.next.length > 0 && (
                         <div className="flex gap-1">
@@ -131,14 +133,14 @@ export default function OrdersPage() {
                             <button key={nextStatus} onClick={() => updateStatus(order.id, nextStatus)}
                               className="text-[10px] font-medium px-2.5 py-1 rounded-full transition-all hover:scale-105"
                               style={{ background: STATUS_CONFIG[nextStatus].bg, color: STATUS_CONFIG[nextStatus].color }}>
-                              {STATUS_CONFIG[nextStatus].label}
+                              {t('order_'+nextStatus)}
                             </button>
                           ))}
                           {st.next.includes('cancelled') && (
                             <button onClick={() => updateStatus(order.id, 'cancelled')}
                               className="text-[10px] font-medium px-2.5 py-1 rounded-full transition-all hover:scale-105"
                               style={{ background: 'rgba(220,50,50,0.08)', color: '#e05a5a' }}>
-                              Cancel
+                              {t('order_cancel')}
                             </button>
                           )}
                         </div>

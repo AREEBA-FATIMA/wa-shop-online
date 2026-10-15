@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
+import { useT } from '@/contexts/LangContext';
 import { Crown, Check, Loader2, Clock, CreditCard, ChevronRight, Copy, Smartphone, Building2, Medal, ClipboardList } from 'lucide-react';
 
 const PLAN_ICONS: Record<string, React.ReactNode> = { basic: <Medal size={24} />, pro: <Crown size={24} /> };
 
 export default function SubscriptionPage() {
+  const { t } = useT();
   const [plans, setPlans] = useState<Record<string, any>>({});
   const [paymentDetails, setPaymentDetails] = useState<Record<string, string>>({});
   const [orders, setOrders] = useState<any[]>([]);
@@ -51,8 +53,8 @@ export default function SubscriptionPage() {
           <Crown size={18} style={{ color: '#facc15' }} />
         </span>
         <div>
-          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>Subscription</h1>
-          <p className="text-sm" style={{ color: 'var(--text3)' }}>Premium plans unlock all features</p>
+          <h1 className="brand text-xl font-bold" style={{ color: 'var(--text)' }}>{t('sub_title')}</h1>
+          <p className="text-sm" style={{ color: 'var(--text3)' }}>{t('sub_sub')}</p>
         </div>
       </div>
 
@@ -70,7 +72,7 @@ export default function SubscriptionPage() {
                   </span>
                   <div>
                     <h3 className="font-bold text-lg" style={{ color: 'var(--text)' }}>{plan.name}</h3>
-                    {isActive && <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>Current Plan</span>}
+                    {isActive && <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>{t('sub_current')}</span>}
                   </div>
                 </div>
                 <p className="text-2xl font-bold mb-1" style={{ color: 'var(--text)' }}>
@@ -88,7 +90,7 @@ export default function SubscriptionPage() {
                   <button onClick={() => buy(key)} disabled={buying}
                     className="btn-primary w-full justify-center text-sm" style={{ opacity: buying ? 0.6 : 1 }}>
                     {buying && isSelected ? <Loader2 size={14} className="animate-spin" /> : <Crown size={14} />}
-                    {buying && isSelected ? 'Processing...' : `Buy ${plan.name}`}
+                    {buying && isSelected ? t('sub_processing') : t('sub_buy', { plan: plan.name })}
                   </button>
                 )}
               </div>
@@ -107,7 +109,7 @@ export default function SubscriptionPage() {
       {Object.keys(paymentDetails).length > 0 && (
         <div className="rounded-2xl p-5" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
-            <CreditCard size={14} />Payment Details
+            <CreditCard size={14} />{t('sub_payment_details')}
           </h2>
           <p className="text-xs mb-3" style={{ color: 'var(--text3)' }}>Order create karein, phir neeche diye gaye account mein pay karein. Admin approve kare ga.</p>
           <div className="space-y-2">
@@ -135,7 +137,7 @@ export default function SubscriptionPage() {
       {pendingOrders.length > 0 && (
         <div className="rounded-2xl p-5" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
           <h2 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: 'var(--text)' }}>
-            <Clock size={14} />Pending Orders
+            <Clock size={14} />{t('sub_pending_orders')}
           </h2>
           <div className="space-y-2">
             {pendingOrders.map((o: any) => (

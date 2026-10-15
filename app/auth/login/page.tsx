@@ -4,9 +4,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api, { setToken } from '@/lib/api';
 import { MessageCircle, Phone, Lock, Loader2, ArrowRight } from 'lucide-react';
+import { useT } from '@/contexts/LangContext';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Login() {
   const router = useRouter();
+  const { t } = useT();
   const [phone, setPhone] = useState('');
   const [pass, setPass] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +28,7 @@ export default function Login() {
         router.push('/connect-wa');
       }
     } catch (e: any) {
-      setErr(e.response?.data?.detail || 'Login failed');
+      setErr(e.response?.data?.detail || t('auth_login_failed'));
     } finally { setLoading(false); }
   }
 
@@ -40,21 +43,22 @@ export default function Login() {
           <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center mx-auto mb-6">
             <MessageCircle size={32} className="text-white" />
           </div>
-          <h2 className="brand font-bold text-4xl mb-3">Welcome Back!</h2>
-          <p className="text-white/70 max-w-sm">Apne WhatsApp business ko manage karein — AI ke sath</p>
+          <h2 className="brand font-bold text-4xl mb-3">{t('auth_welcome_back')}</h2>
+          <p className="text-white/70 max-w-sm">{t('auth_welcome_sub')}</p>
         </div>
       </div>
 
       {/* Right — Form */}
       <div className="flex-1 flex items-center justify-center px-6 py-8" style={{ background: 'var(--bg)' }}>
         <div className="w-full max-w-sm animate-fade-in">
+          <div className="flex justify-end mb-2"><LanguageSwitcher compact /></div>
           <div className="text-center mb-8">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4 lg:hidden"
               style={{ background: 'var(--green-gradient)', boxShadow: '0 8px 24px rgba(37,211,102,0.25)' }}>
               <MessageCircle size={24} className="text-white" />
             </div>
-            <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>Login</h1>
-            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>Apne account mein wapas aayein</p>
+            <h1 className="brand font-bold text-2xl" style={{ color: 'var(--text)' }}>{t('auth_login_title')}</h1>
+            <p className="text-sm mt-1" style={{ color: 'var(--text3)' }}>{t('auth_login_sub')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -66,7 +70,7 @@ export default function Login() {
                 className="field"
                 required
               />
-              <label><Phone size={12} style={{ display: 'inline', marginRight: 4 }} />Phone Number</label>
+              <label><Phone size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_phone')}</label>
             </div>
             <div className="floating-label">
               <input
@@ -77,7 +81,7 @@ export default function Login() {
                 className="field"
                 required
               />
-              <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />Password</label>
+              <label><Lock size={12} style={{ display: 'inline', marginRight: 4 }} />{t('auth_password')}</label>
             </div>
 
             {err && (
@@ -91,14 +95,14 @@ export default function Login() {
               className="btn-primary-gradient w-full justify-center"
               style={{ opacity: loading ? 0.7 : 1 }}>
               {loading ? <Loader2 size={16} className="animate-spin" /> : null}
-              Login <ArrowRight size={16} />
+              {t('auth_login_cta')} <ArrowRight size={16} />
             </button>
           </form>
 
           <p className="text-center text-xs mt-6" style={{ color: 'var(--text3)' }}>
-            Account nahi hai?{' '}
+            {t('auth_no_account')}{' '}
             <Link href="/auth/register" className="font-semibold" style={{ color: 'var(--green)' }}>
-              Register karein
+              {t('auth_register_link')}
             </Link>
           </p>
         </div>
