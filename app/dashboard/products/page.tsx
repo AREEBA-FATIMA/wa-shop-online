@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
-import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera, Grid3X3, List, Image as ImageIcon, DollarSign, Hash } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, X, Loader2, Check, Camera, Grid3X3, List, Image as ImageIcon, DollarSign, Hash, Share2 } from 'lucide-react';
 import { useT } from '@/contexts/LangContext';
 
 interface Product {
@@ -94,6 +94,18 @@ export default function ProductsPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
+  const [shareMsg, setShareMsg] = useState('');
+  function shareShop() {
+    try {
+      const u = JSON.parse(localStorage.getItem('wa_user') || '{}');
+      if (!u.id) return;
+      const url = `${window.location.origin}/shop/${u.id}`;
+      navigator.clipboard.writeText(url);
+      setShareMsg(t('shop_link_copied'));
+      setTimeout(() => setShareMsg(''), 2500);
+    } catch {}
+  }
+
   useEffect(() => { load(); }, []);
 
   return (
@@ -105,6 +117,9 @@ export default function ProductsPage() {
           <p className="text-sm" style={{ color: 'var(--text3)' }}>{products.length} products</p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={shareShop} className="btn-ghost text-sm" style={{ padding: '8px 14px' }} title={t('shop_share')}>
+            <Share2 size={15} /> <span className="hidden sm:inline">{t('shop_share')}</span>
+          </button>
           {/* View toggle */}
           <div className="flex rounded-lg overflow-hidden" style={{ border: '0.5px solid var(--border)' }}>
             <button onClick={() => setView('grid')} className="p-2 transition-colors" style={{ background: view === 'grid' ? 'var(--bg3)' : 'transparent', color: view === 'grid' ? 'var(--text)' : 'var(--text3)' }}><Grid3X3 size={15} /></button>
@@ -112,6 +127,10 @@ export default function ProductsPage() {
           </div>
         </div>
       </div>
+
+      {shareMsg && (
+        <p className="text-sm text-center mb-4 py-2 px-4 rounded-xl" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>{shareMsg}</p>
+      )}
 
       {loading ? (
         <div className={view === 'grid' ? 'grid md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>

@@ -13,6 +13,14 @@ export const translations: Record<string, Record<string, string>> = {
   nav_logout: { en: 'Logout', ur: 'لاگ آؤٹ', roman_ur: 'Logout' },
   nav_broadcast: { en: 'Broadcast', ur: 'براڈکاسٹ', roman_ur: 'Broadcast' },
 
+  // ── Storefront (public) ───────────────────────────────────────────────────────
+  shop_order: { en: 'Order on WhatsApp', ur: 'واٹس ایپ پر آرڈر کریں', roman_ur: 'WhatsApp par order karein' },
+  shop_empty: { en: 'No products available right now', ur: 'ابھی کوئی پروڈکٹ دستیاب نہیں', roman_ur: 'Abhi koi product available nahi' },
+  shop_powered: { en: 'Powered by WA-SHOP', ur: 'WA-SHOP کے ذریعے', roman_ur: 'Powered by WA-SHOP' },
+  shop_order_msg: { en: 'Hi! I want to order: ', ur: 'سلام! مجھے آرڈر کرنا ہے: ', roman_ur: 'Assalam o alaikum! Mujhe order karna hai: ' },
+  shop_share: { en: 'Share shop', ur: 'دکان شیئر کریں', roman_ur: 'Shop share karein' },
+  shop_link_copied: { en: 'Shop link copied!', ur: 'دکان کا لنک کاپی ہوگیا!', roman_ur: 'Shop link copy hogaya!' },
+
   // ── Broadcast ───────────────────────────────────────────────────────────────
   bc_title: { en: 'Broadcast', ur: 'براڈکاسٹ', roman_ur: 'Broadcast' },
   bc_sub: { en: 'Send one message to all your customers', ur: 'ایک پیغام اپنے تمام گاہکوں کو بھیجیں', roman_ur: 'Ek message apne saare customers ko bhejein' },
