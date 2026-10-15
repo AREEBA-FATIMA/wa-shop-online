@@ -4,7 +4,12 @@ import api from '@/lib/api';
 import { useT } from '@/contexts/LangContext';
 import { ShoppingBag, CheckCircle2, Clock, XCircle, Truck, Package, MapPin, Search, Receipt } from 'lucide-react';
 
-interface Order { id: string; customer_name: string; customer_phone: string; product_name: string; amount: number; status: string; created_at: string; delivery_address?: string; }
+interface Order { id: string; customer_name: string; customer_phone: string; product_name: string; amount: number; status: string; created_at: string; delivery_address?: string; courier?: string; tracking_number?: string; }
+
+const COURIERS = ['TCS', 'Leopards', 'M&P', 'Trax', 'PostEx', 'BlueEx', 'Other'];
+function trackUrl(courier: string, num: string) {
+  return `https://www.google.com/search?q=${encodeURIComponent((courier || '') + ' tracking ' + num)}`;
+}
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; next: string[] }> = {
   pending:   { label: 'Pending',   color: '#e8a030', bg: 'rgba(234,160,30,0.1)', next: ['confirmed', 'cancelled'] },
@@ -33,6 +38,19 @@ export default function OrdersPage() {
     catch (e: any) { setReceiptMsg(e?.response?.data?.detail || t('order_receipt_fail')); }
     setReceiptBusy(''); setTimeout(() => setReceiptMsg(''), 2500);
   }
+
+  const [trackOpen, setTrackOpen] = useState('');
+  const [trackCourier, setTrackCourier] = useState('TCS');
+  const [trackNum, setTrackNum] = useState('');
+  function openTrack(o: Order) { setTrackOpen(o.id); setTrackCourier(o.courier || 'TCS'); setTrackNum(o.tracking_number || ''); }
+  async function saveTracking(id: string) {
+    if (!trackNum.trim()) return;
+    try {
+      await api.put(`/api/orders/${id}/tracking`, { courier: trackCourier, tracking_number: trackNum.trim(), notify: true });
+      setTrackOpen(''); setTrackNum(''); await load();
+    } catch {}
+  }
+
   useEffect(() => { load(); }, []);
 
   const filtered = orders.filter(o => {
@@ -131,6 +149,35 @@ export default function OrdersPage() {
                           ) : (
                             <p className="text-xs" style={{ color: 'var(--text3)' }}>{order.delivery_address}</p>
                           )}
+                        </div>
+                      )}
+
+                      {/* Delivery tracking */}
+                      {order.tracking_number ? (
+                        <div className="mt-2 flex items-center gap-2 flex-wrap text-xs">
+                          <span className="flex items-center gap-1" style={{ color: 'var(--text2)' }}>
+                            <Truck size={12} style={{ color: 'var(--teal)' }} /> {order.courier || '—'}: {order.tracking_number}
+                          </span>
+                          <a href={trackUrl(order.courier || '', order.tracking_number)} target="_blank" rel="noopener noreferrer"
+                            className="font-medium hover:underline" style={{ color: 'var(--blue)' }}>{t('track_link')} ↗</a>
+                          <button onClick={() => openTrack(order)} className="text-[11px]" style={{ color: 'var(--text3)' }}>✎</button>
+                        </div>
+                      ) : trackOpen !== order.id ? (
+                        <button onClick={() => openTrack(order)} className="mt-2 flex items-center gap-1 text-xs font-medium" style={{ color: 'var(--teal)' }}>
+                          <Truck size={12} /> {t('track_add')}
+                        </button>
+                      ) : null}
+
+                      {trackOpen === order.id && (
+                        <div className="mt-2 flex flex-wrap items-center gap-2 animate-slide-down">
+                          <select value={trackCourier} onChange={e => setTrackCourier(e.target.value)}
+                            className="text-xs rounded-lg px-2 py-1.5 outline-none" style={{ background: 'var(--bg3)', color: 'var(--text)', border: '0.5px solid var(--border)' }}>
+                            {COURIERS.map(cu => <option key={cu} value={cu}>{cu}</option>)}
+                          </select>
+                          <input value={trackNum} onChange={e => setTrackNum(e.target.value)} placeholder={t('track_number')}
+                            className="field text-xs" style={{ maxWidth: 160, padding: '7px 10px' }} />
+                          <button onClick={() => saveTracking(order.id)} className="btn-primary text-xs" style={{ padding: '7px 14px' }}>{t('track_save')}</button>
+                          <button onClick={() => setTrackOpen('')} className="text-xs" style={{ color: 'var(--text3)' }}>✕</button>
                         </div>
                       )}
                     </div>

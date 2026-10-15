@@ -135,6 +135,12 @@ export const translations: Record<string, Record<string, string>> = {
   order_receipt: { en: 'Send receipt', ur: 'رسید بھیجیں', roman_ur: 'Receipt bhejein' },
   order_receipt_sent: { en: 'Receipt sent ✓', ur: 'رسید بھیج دی ✓', roman_ur: 'Receipt bhej di ✓' },
   order_receipt_fail: { en: 'Could not send receipt', ur: 'رسید نہیں بھیجی جا سکی', roman_ur: 'Receipt nahi bheji ja saki' },
+  track_add: { en: 'Add tracking', ur: 'ٹریکنگ شامل کریں', roman_ur: 'Tracking add karein' },
+  track_courier: { en: 'Courier', ur: 'کورئیر', roman_ur: 'Courier' },
+  track_number: { en: 'Tracking number', ur: 'ٹریکنگ نمبر', roman_ur: 'Tracking number' },
+  track_save: { en: 'Save & notify customer', ur: 'محفوظ کریں اور گاہک کو بتائیں', roman_ur: 'Save karein aur customer ko batayein' },
+  track_link: { en: 'Track', ur: 'ٹریک کریں', roman_ur: 'Track' },
+  track_saved: { en: 'Tracking saved ✓', ur: 'ٹریکنگ محفوظ ✓', roman_ur: 'Tracking save ✓' },
 
   // ── Chats ───────────────────────────────────────────────────────────────────
   chat_search: { en: 'Search chats...', ur: 'چیٹس تلاش کریں...', roman_ur: 'Chats dhoondein...' },
