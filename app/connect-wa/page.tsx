@@ -177,6 +177,7 @@ export default function ConnectWA() {
     const userId = getUserId();
     if (!userId) { router.push('/auth/login'); return; }
 
+    let restorePoll: ReturnType<typeof setInterval> | null = null;
     async function checkStatus() {
       try {
         const r = await fetch(`${WA_URL}/wa/status/${userId}`, { headers: waAuth() });
@@ -185,11 +186,26 @@ export default function ConnectWA() {
           router.push('/dashboard');
           return;
         }
+        if (d.restoring) {
+          // Saved session is waking up — show reconnecting and auto-continue.
+          setStatus('loading');
+          setErrMsg('WhatsApp dobara connect ho raha hai…');
+          if (!restorePoll) {
+            restorePoll = setInterval(async () => {
+              try {
+                const rr = await fetch(`${WA_URL}/wa/status/${userId}`, { headers: waAuth() });
+                const dd = await rr.json();
+                if (dd.connected) { if (restorePoll) clearInterval(restorePoll); router.push('/dashboard'); }
+              } catch {}
+            }, 3000);
+          }
+          return;
+        }
       } catch {}
       setStep(1);
     }
     checkStatus();
-    return () => { esRef.current?.close(); clearAllTimers(); };
+    return () => { esRef.current?.close(); clearAllTimers(); if (restorePoll) clearInterval(restorePoll); };
   }, []);
 
   const showTabs = status === 'idle' || status === 'error';

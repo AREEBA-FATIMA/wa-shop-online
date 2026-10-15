@@ -14,6 +14,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const { t } = useT();
   const [user, setUser] = useState<any>(null);
   const [waConnected, setWaConnected] = useState(false);
+  const [waRestoring, setWaRestoring] = useState(false);
   const [waLoading, setWaLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [waAlert, setWaAlert] = useState(false);
@@ -80,6 +81,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`, { headers: waAuth() });
         const d = await r.json();
         setWaConnected(!!d.connected);
+        setWaRestoring(!!d.restoring && !d.connected);
       } catch { setWaConnected(false); }
     }
     checkWA();
@@ -88,6 +90,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         const r = await fetch(`${WA_URL}/wa/status/${parsed.id}`, { headers: waAuth() });
         const d = await r.json();
         setWaConnected(!!d.connected);
+        setWaRestoring(!!d.restoring && !d.connected);
       } catch {}
     }, 30000);
     return () => clearInterval(interval);
@@ -137,7 +140,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-1.5">
             <Link href="/connect-wa" className="relative">
-              <span className={`w-2 h-2 rounded-full block ${waLoading ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} />
+              <span className={`w-2 h-2 rounded-full block ${(waLoading || waRestoring) ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : waRestoring ? 'var(--amber)' : '#e05a5a' }} />
             </Link>
             <ThemeToggle />
           </div>
@@ -168,10 +171,10 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
           <Link href="/connect-wa"
             className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all"
             style={{
-              background: waConnected ? 'var(--green-dim)' : 'rgba(220,50,50,0.08)',
-              color: waConnected ? 'var(--green)' : '#e05a5a',
+              background: waConnected ? 'var(--green-dim)' : waRestoring ? 'rgba(196,130,14,0.1)' : 'rgba(220,50,50,0.08)',
+              color: waConnected ? 'var(--green)' : waRestoring ? 'var(--amber)' : '#e05a5a',
             }}>
-            {waLoading ? (
+            {(waLoading || waRestoring) ? (
               <><RefreshCw size={14} className="animate-spin" />{t('wa_reconnecting')}</>
             ) : waConnected ? (
               <><span className="w-2 h-2 rounded-full" style={{ background: 'var(--green)' }} /><Wifi size={14} />{t('wa_connected')}</>
@@ -198,7 +201,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             <span className="brand font-bold text-sm" style={{ color: 'var(--text)' }}>WA<span className="gradient-text-green">SHOP</span></span>
           </Link>
           <div className="ml-auto flex items-center gap-2">
-            <Link href="/connect-wa"><span className={`w-2 h-2 rounded-full block ${waLoading ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : '#e05a5a' }} /></Link>
+            <Link href="/connect-wa"><span className={`w-2 h-2 rounded-full block ${(waLoading || waRestoring) ? 'animate-pulse' : ''}`} style={{ background: waConnected ? 'var(--green)' : waRestoring ? 'var(--amber)' : '#e05a5a' }} /></Link>
             <ThemeToggle />
           </div>
         </header>
