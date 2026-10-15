@@ -129,6 +129,9 @@ export const translations: Record<string, Record<string, string>> = {
   order_cancel: { en: 'Cancel', ur: 'منسوخ کریں', roman_ur: 'Cancel' },
   order_view_location: { en: 'View location', ur: 'لوکیشن دیکھیں', roman_ur: 'Location dekhein' },
   common_unknown: { en: 'Unknown', ur: 'نامعلوم', roman_ur: 'Unknown' },
+  order_receipt: { en: 'Send receipt', ur: 'رسید بھیجیں', roman_ur: 'Receipt bhejein' },
+  order_receipt_sent: { en: 'Receipt sent ✓', ur: 'رسید بھیج دی ✓', roman_ur: 'Receipt bhej di ✓' },
+  order_receipt_fail: { en: 'Could not send receipt', ur: 'رسید نہیں بھیجی جا سکی', roman_ur: 'Receipt nahi bheji ja saki' },
 
   // ── Chats ───────────────────────────────────────────────────────────────────
   chat_search: { en: 'Search chats...', ur: 'چیٹس تلاش کریں...', roman_ur: 'Chats dhoondein...' },

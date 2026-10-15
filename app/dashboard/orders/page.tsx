@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { useT } from '@/contexts/LangContext';
-import { ShoppingBag, CheckCircle2, Clock, XCircle, Truck, Package, MapPin, Search } from 'lucide-react';
+import { ShoppingBag, CheckCircle2, Clock, XCircle, Truck, Package, MapPin, Search, Receipt } from 'lucide-react';
 
 interface Order { id: string; customer_name: string; customer_phone: string; product_name: string; amount: number; status: string; created_at: string; delivery_address?: string; }
 
@@ -25,6 +25,14 @@ export default function OrdersPage() {
 
   async function load() { try { const r = await api.get('/api/orders'); setOrders(r.data); } catch {} finally { setLoading(false); } }
   async function updateStatus(id: string, status: string) { try { await api.put(`/api/orders/${id}/status`, { status }); await load(); } catch {} }
+  const [receiptMsg, setReceiptMsg] = useState('');
+  const [receiptBusy, setReceiptBusy] = useState('');
+  async function sendReceipt(id: string) {
+    setReceiptBusy(id); setReceiptMsg('');
+    try { await api.post(`/api/orders/${id}/receipt`); setReceiptMsg(t('order_receipt_sent')); }
+    catch (e: any) { setReceiptMsg(e?.response?.data?.detail || t('order_receipt_fail')); }
+    setReceiptBusy(''); setTimeout(() => setReceiptMsg(''), 2500);
+  }
   useEffect(() => { load(); }, []);
 
   const filtered = orders.filter(o => {
@@ -78,6 +86,10 @@ export default function OrdersPage() {
           </button>
         ))}
       </div>
+
+      {receiptMsg && (
+        <p className="text-sm text-center mb-4 py-2 px-4 rounded-xl" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>{receiptMsg}</p>
+      )}
 
       {loading ? (
         <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 rounded-2xl skeleton" />)}</div>
@@ -145,6 +157,11 @@ export default function OrdersPage() {
                           )}
                         </div>
                       )}
+                      <button onClick={() => sendReceipt(order.id)} disabled={receiptBusy === order.id}
+                        className="flex items-center gap-1 text-[10px] font-medium px-2.5 py-1 rounded-full transition-all hover:scale-105"
+                        style={{ background: 'var(--green-dim)', color: 'var(--green)', opacity: receiptBusy === order.id ? 0.5 : 1 }}>
+                        <Receipt size={11} /> {t('order_receipt')}
+                      </button>
                     </div>
                   </div>
                 </div>
