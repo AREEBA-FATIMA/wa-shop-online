@@ -7,9 +7,41 @@ import { TrendingUp, ShoppingBag, MessageCircle, Package, AlertTriangle, Clock, 
 export default function AnalyticsPage() {
   const { t } = useT();
   const [data, setData] = useState<any>(null);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { api.get('/api/analytics').then(r => setData(r.data)).catch(() => {}).finally(() => setLoading(false)); }, []);
+  useEffect(() => {
+    Promise.all([
+      api.get('/api/analytics').then(r => setData(r.data)).catch(() => {}),
+      api.get('/api/orders').then(r => setOrders(r.data || [])).catch(() => {}),
+    ]).finally(() => setLoading(false));
+  }, []);
+
+  // Best sellers (by order count)
+  const bestSellers = (() => {
+    const m: Record<string, { count: number; revenue: number }> = {};
+    orders.forEach(o => {
+      const k = o.product_name || '—';
+      if (!m[k]) m[k] = { count: 0, revenue: 0 };
+      m[k].count += 1; m[k].revenue += (o.amount || 0);
+    });
+    return Object.entries(m).sort((a, b) => b[1].count - a[1].count).slice(0, 5);
+  })();
+  const maxCount = Math.max(1, ...bestSellers.map(([, v]) => v.count));
+
+  // Revenue last 7 days
+  const revenue7d = (() => {
+    const days: { label: string; value: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      const label = d.toLocaleDateString('en-PK', { weekday: 'short' });
+      const value = orders.filter(o => (o.created_at || '').slice(0, 10) === key).reduce((s, o) => s + (o.amount || 0), 0);
+      days.push({ label, value });
+    }
+    return days;
+  })();
+  const maxRev = Math.max(1, ...revenue7d.map(d => d.value));
 
   const stats = [
     { label: t('analytics_total_revenue'), value: `Rs.${(data?.total_revenue || 0).toLocaleString()}`, icon: DollarSign, color: 'var(--green)', bg: 'var(--green-dim)' },
@@ -86,6 +118,42 @@ export default function AnalyticsPage() {
           </div>
         </div>
       )}
+
+      {/* Revenue last 7 days */}
+      <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
+        <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text)' }}>{t('analytics_revenue_7d')}</h2>
+        <div className="flex items-end justify-between gap-2" style={{ height: 120 }}>
+          {revenue7d.map((d, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center justify-end h-full gap-1.5">
+              <span className="text-[9px] font-semibold" style={{ color: 'var(--text3)' }}>{d.value > 0 ? (d.value >= 1000 ? (d.value/1000).toFixed(1)+'k' : d.value) : ''}</span>
+              <div className="w-full rounded-t-md transition-all" style={{ height: `${Math.max(2, (d.value / maxRev) * 90)}%`, background: d.value > 0 ? 'var(--green)' : 'var(--bg4)', minHeight: 3 }} />
+              <span className="text-[10px]" style={{ color: 'var(--text3)' }}>{d.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Best sellers */}
+      <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
+        <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text)' }}>{t('analytics_best_sellers')}</h2>
+        {bestSellers.length === 0 ? (
+          <p className="text-sm text-center py-4" style={{ color: 'var(--text3)' }}>{t('analytics_no_data')}</p>
+        ) : (
+          <div className="space-y-3">
+            {bestSellers.map(([name, v], i) => (
+              <div key={i}>
+                <div className="flex items-center justify-between text-xs mb-1">
+                  <span className="font-medium truncate" style={{ color: 'var(--text)' }}>{name}</span>
+                  <span style={{ color: 'var(--text3)' }}>{v.count} {t('analytics_orders_word')} · Rs.{v.revenue.toLocaleString()}</span>
+                </div>
+                <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--bg3)' }}>
+                  <div className="h-full rounded-full" style={{ width: `${(v.count / maxCount) * 100}%`, background: 'var(--teal)' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Performance summary */}
       <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>

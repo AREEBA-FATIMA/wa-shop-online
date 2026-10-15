@@ -180,6 +180,10 @@ export const translations: Record<string, Record<string, string>> = {
   analytics_aov: { en: 'Avg Order Value', ur: 'اوسط آرڈر ویلیو', roman_ur: 'Avg Order Value' },
   analytics_resp: { en: 'Response Time', ur: 'ریسپانس ٹائم', roman_ur: 'Response Time' },
   analytics_ai_replies: { en: 'AI Replies', ur: 'AI جوابات', roman_ur: 'AI Replies' },
+  analytics_best_sellers: { en: 'Best Sellers', ur: 'سب سے زیادہ بکنے والے', roman_ur: 'Best Sellers' },
+  analytics_revenue_7d: { en: 'Revenue — last 7 days', ur: 'آمدنی — پچھلے 7 دن', roman_ur: 'Revenue — pichle 7 din' },
+  analytics_orders_word: { en: 'orders', ur: 'آرڈرز', roman_ur: 'orders' },
+  analytics_no_data: { en: 'Not enough data yet', ur: 'ابھی کافی ڈیٹا نہیں', roman_ur: 'Abhi kaafi data nahi' },
 
   // ── Settings ────────────────────────────────────────────────────────────────
   settings_title: { en: 'Settings', ur: 'سیٹنگز', roman_ur: 'Settings' },
