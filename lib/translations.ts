@@ -114,6 +114,9 @@ export const translations: Record<string, Record<string, string>> = {
   prod_left: { en: 'left', ur: 'باقی', roman_ur: 'baqi' },
   prod_out_of_stock: { en: 'Out of stock', ur: 'اسٹاک ختم', roman_ur: 'Stock khatam' },
   common_delete_confirm: { en: 'Delete this?', ur: 'حذف کریں؟', roman_ur: 'Delete karein?' },
+  prod_variants: { en: 'Variants / Options', ur: 'ورائٹی / آپشنز', roman_ur: 'Variants / Options' },
+  prod_variants_ph: { en: 'e.g. Size: S,M,L | Color: Red,Blue', ur: 'مثلاً سائز: S,M,L | رنگ: سرخ،نیلا', roman_ur: 'e.g. Size: S,M,L | Color: Red,Blue' },
+  prod_low_stock: { en: 'Low stock', ur: 'کم اسٹاک', roman_ur: 'Low stock' },
 
   // ── Orders ──────────────────────────────────────────────────────────────────
   order_title: { en: 'Orders', ur: 'آرڈرز', roman_ur: 'Orders' },

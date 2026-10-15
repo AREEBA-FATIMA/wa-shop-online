@@ -7,7 +7,7 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 
-interface Item { id: string; name: string; description: string; price: number; discount_price: number | null; image_url?: string; category?: string; }
+interface Item { id: string; name: string; description: string; price: number; discount_price: number | null; image_url?: string; category?: string; variants?: string; }
 
 export default function ShopPage() {
   const { t } = useT();
@@ -82,6 +82,7 @@ export default function ShopPage() {
                   <div className="p-3 flex flex-col flex-1">
                     <p className="text-sm font-semibold leading-tight" style={{ color: 'var(--text)' }}>{p.name}</p>
                     {p.description && <p className="text-[11px] mt-0.5 line-clamp-2" style={{ color: 'var(--text3)' }}>{p.description}</p>}
+                    {p.variants && <p className="text-[10px] mt-1" style={{ color: 'var(--teal)' }}>{p.variants}</p>}
                     <div className="flex items-center gap-1.5 mt-1.5">
                       <span className="font-bold" style={{ color: 'var(--green)' }}>Rs.{p.discount_price || p.price}</span>
                       {onSale && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}

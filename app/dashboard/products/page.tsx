@@ -8,12 +8,12 @@ interface Product {
   id: string; name: string; description: string; price: number;
   discount_price: number | null; floor_price: number; stock: number;
   available_stock?: number; ordered_count?: number;
-  category: string | null; include_in_status: boolean; image_url?: string;
+  category: string | null; variants?: string; include_in_status: boolean; image_url?: string;
 }
 
 const EMPTY: Omit<Product, 'id'> = {
   name: '', description: '', price: 0, discount_price: null,
-  floor_price: 0, stock: 0, category: '', include_in_status: true, image_url: ''
+  floor_price: 0, stock: 0, category: '', variants: '', include_in_status: true, image_url: ''
 };
 
 export default function ProductsPage() {
@@ -33,7 +33,7 @@ export default function ProductsPage() {
 
   function openAdd() { setForm(EMPTY); setEditing(null); setSheetOpen(true); setErr(''); setImgPreview(''); }
   function openEdit(p: Product) {
-    setForm({ name: p.name, description: p.description, price: p.price, discount_price: p.discount_price, floor_price: p.floor_price, stock: p.stock, category: p.category || '', include_in_status: p.include_in_status, image_url: p.image_url || '' });
+    setForm({ name: p.name, description: p.description, price: p.price, discount_price: p.discount_price, floor_price: p.floor_price, stock: p.stock, category: p.category || '', variants: p.variants || '', include_in_status: p.include_in_status, image_url: p.image_url || '' });
     setEditing(p); setSheetOpen(true); setErr(''); setImgPreview(p.image_url || '');
   }
 
@@ -180,9 +180,13 @@ export default function ProductsPage() {
                     {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>{t('prod_floor_label')}: Rs.{p.floor_price}</p>}
                   </div>
                 </div>
-                {p.category && (
-                  <div className="mt-2 flex">
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>{p.category}</span>
+                {(p.category || p.variants || (p.available_stock ?? p.stock) <= 3) && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {(p.available_stock ?? p.stock) <= 3 && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}>{t('prod_low_stock')}</span>
+                    )}
+                    {p.category && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>{p.category}</span>}
+                    {p.variants && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--green-dim)', color: 'var(--green)' }}>{p.variants}</span>}
                   </div>
                 )}
               </div>
@@ -260,6 +264,7 @@ export default function ProductsPage() {
                 { label: 'prod_floor_price', key: 'floor_price', type: 'number', icon: null, tip: 'prod_floor_tip' },
                 { label: 'prod_stock', key: 'stock', type: 'number', icon: Hash },
                 { label: 'prod_category', key: 'category', type: 'text', icon: null },
+                { label: 'prod_variants', key: 'variants', type: 'text', icon: null, tip: 'prod_variants_ph' },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-xs font-medium mb-1 block" style={{ color: 'var(--text3)' }}>{t(f.label)}</label>
