@@ -143,6 +143,12 @@ export const translations: Record<string, Record<string, string>> = {
   chat_send: { en: 'Send', ur: 'بھیجیں', roman_ur: 'Send' },
   chat_edit: { en: 'Edit', ur: 'ترمیم', roman_ur: 'Edit' },
   chat_dismiss: { en: 'Dismiss', ur: 'ختم کریں', roman_ur: 'Dismiss' },
+  crm_title: { en: 'Customer notes', ur: 'گاہک کے نوٹس', roman_ur: 'Customer notes' },
+  crm_notes_ph: { en: 'Private notes (size, preference, address…)', ur: 'ذاتی نوٹس (سائز، پسند، پتہ…)', roman_ur: 'Private notes (size, pasand, address…)' },
+  crm_tags_ph: { en: 'Tags (comma separated)', ur: 'ٹیگز (کاما سے الگ)', roman_ur: 'Tags (comma se alag)' },
+  crm_save: { en: 'Save', ur: 'محفوظ کریں', roman_ur: 'Save' },
+  crm_saved: { en: 'Saved ✓', ur: 'محفوظ ✓', roman_ur: 'Save ✓' },
+  crm_repeat: { en: 'Repeat customer', ur: 'بار بار آنے والا گاہک', roman_ur: 'Repeat customer' },
 
   // ── Status ──────────────────────────────────────────────────────────────────
   status_title: { en: 'Status', ur: 'اسٹیٹس', roman_ur: 'Status' },

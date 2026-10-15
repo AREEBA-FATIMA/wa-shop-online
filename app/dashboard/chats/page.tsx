@@ -2,9 +2,9 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '@/lib/api';
 import { useT } from '@/contexts/LangContext';
-import { Send, Bot, User2, Search, RefreshCw, MessageCircle, Trash2, Phone, MoreVertical, Check, CheckCheck } from 'lucide-react';
+import { Send, Bot, User2, Search, RefreshCw, MessageCircle, Trash2, Phone, MoreVertical, Check, CheckCheck, StickyNote, Star } from 'lucide-react';
 
-interface Chat { id: string; customer_phone: string; customer_name: string; last_message: string; last_message_at: string; unread_count: number; status: string; }
+interface Chat { id: string; customer_phone: string; customer_name: string; last_message: string; last_message_at: string; unread_count: number; status: string; notes?: string; tags?: string; order_count?: number; }
 interface Message { id: string; content: string; from_customer: boolean; created_at: string; ai_generated: boolean; }
 
 function timeAgo(iso: string) {
@@ -33,8 +33,28 @@ export default function ChatsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [aiSuggestion, setAiSuggestion] = useState('');
+  const [crmOpen, setCrmOpen] = useState(false);
+  const [crmNotes, setCrmNotes] = useState('');
+  const [crmTags, setCrmTags] = useState('');
+  const [crmSaved, setCrmSaved] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    setCrmNotes(active?.notes || '');
+    setCrmTags(active?.tags || '');
+    setCrmOpen(false);
+  }, [active?.id]);
+
+  async function saveCrm() {
+    if (!active) return;
+    try {
+      await api.put(`/api/chats/${active.id}/crm`, { notes: crmNotes, tags: crmTags });
+      setChats(prev => prev.map(c => c.id === active.id ? { ...c, notes: crmNotes, tags: crmTags } : c));
+      setActive(a => a ? { ...a, notes: crmNotes, tags: crmTags } : a);
+      setCrmSaved(true); setTimeout(() => setCrmSaved(false), 2000);
+    } catch {}
+  }
 
   function getUserId() { try { return JSON.parse(localStorage.getItem('wa_user') || '{}').id || ''; } catch { return ''; } }
 
@@ -161,11 +181,32 @@ export default function ChatsPage() {
                 {active.customer_name?.charAt(0)?.toUpperCase() || active.customer_phone.slice(-2)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate" style={{ color: '#fff' }}>{active.customer_name || active.customer_phone}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-semibold truncate" style={{ color: '#fff' }}>{active.customer_name || active.customer_phone}</p>
+                  {(active.order_count ?? 0) > 1 && (
+                    <span className="flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(255,255,255,0.25)', color: '#fff' }} title={t('crm_repeat')}>
+                      <Star size={8} /> {active.order_count}
+                    </span>
+                  )}
+                </div>
                 <p className="text-[11px]" style={{ color: 'rgba(255,255,255,0.75)' }}>{active.customer_phone}</p>
               </div>
-              <button className="p-1.5 rounded-lg transition-colors hover:bg-white/10" style={{ color: '#fff' }}><MoreVertical size={16} /></button>
+              <button onClick={() => setCrmOpen(o => !o)} className="p-1.5 rounded-lg transition-colors hover:bg-white/10" style={{ color: '#fff', background: crmOpen ? 'rgba(255,255,255,0.18)' : 'transparent' }} title={t('crm_title')}><StickyNote size={16} /></button>
             </div>
+
+            {/* CRM panel */}
+            {crmOpen && (
+              <div className="px-4 py-3 space-y-2 animate-slide-down" style={{ background: 'var(--bg2)', borderBottom: '0.5px solid var(--border)' }}>
+                <textarea value={crmNotes} onChange={e => setCrmNotes(e.target.value)} rows={2} maxLength={2000}
+                  placeholder={t('crm_notes_ph')} className="field text-sm" style={{ resize: 'vertical' }} />
+                <input value={crmTags} onChange={e => setCrmTags(e.target.value)} maxLength={200}
+                  placeholder={t('crm_tags_ph')} className="field text-sm" />
+                <div className="flex items-center gap-2">
+                  <button onClick={saveCrm} className="btn-primary text-xs" style={{ padding: '7px 16px' }}>{t('crm_save')}</button>
+                  {crmSaved && <span className="text-xs font-medium" style={{ color: 'var(--green)' }}>{t('crm_saved')}</span>}
+                </div>
+              </div>
+            )}
 
             {/* Messages */}
             <div className="chat-wall flex-1 overflow-y-auto p-4 space-y-2">
