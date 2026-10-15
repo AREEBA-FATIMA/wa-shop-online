@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell } from 'lucide-react';
+import { MessageCircle, Package, ShoppingBag, BarChart3, Settings, LogOut, Wifi, WifiOff, Menu, Home, Radio, RefreshCw, ChevronRight, X, Crown, Bell, Megaphone } from 'lucide-react';
 import api, { removeToken, getToken } from '@/lib/api';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useT } from '@/contexts/LangContext';
@@ -27,6 +27,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     { href: '/dashboard/products', icon: Package, label: t('nav_products') },
     { href: '/dashboard/orders', icon: ShoppingBag, label: t('nav_orders') },
     { href: '/dashboard/status', icon: Radio, label: t('nav_status') },
+    { href: '/dashboard/broadcast', icon: Megaphone, label: t('nav_broadcast') },
     { href: '/dashboard/analytics', icon: BarChart3, label: t('nav_analytics') },
     { href: '/dashboard/subscription', icon: Crown, label: t('nav_subscription') },
     { href: '/dashboard/settings', icon: Settings, label: t('nav_settings') },

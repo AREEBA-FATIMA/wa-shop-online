@@ -11,6 +11,19 @@ export const translations: Record<string, Record<string, string>> = {
   nav_subscribe: { en: 'Subscribe', ur: 'سبسکرائب', roman_ur: 'Subscribe' },
   nav_menu: { en: 'Menu', ur: 'مینیو', roman_ur: 'Menu' },
   nav_logout: { en: 'Logout', ur: 'لاگ آؤٹ', roman_ur: 'Logout' },
+  nav_broadcast: { en: 'Broadcast', ur: 'براڈکاسٹ', roman_ur: 'Broadcast' },
+
+  // ── Broadcast ───────────────────────────────────────────────────────────────
+  bc_title: { en: 'Broadcast', ur: 'براڈکاسٹ', roman_ur: 'Broadcast' },
+  bc_sub: { en: 'Send one message to all your customers', ur: 'ایک پیغام اپنے تمام گاہکوں کو بھیجیں', roman_ur: 'Ek message apne saare customers ko bhejein' },
+  bc_placeholder: { en: 'Write your offer or message…', ur: 'اپنی آفر یا پیغام لکھیں…', roman_ur: 'Apni offer ya message likhein…' },
+  bc_send: { en: 'Send to all customers', ur: 'سب گاہکوں کو بھیجیں', roman_ur: 'Sab customers ko bhejein' },
+  bc_sending: { en: 'Sending…', ur: 'بھیجا جا رہا ہے…', roman_ur: 'Bhej raha hai…' },
+  bc_confirm: { en: 'Send this message to all your customers?', ur: 'یہ پیغام تمام گاہکوں کو بھیجیں؟', roman_ur: 'Ye message sab customers ko bhejein?' },
+  bc_result: { en: '{sent} sent, {failed} failed', ur: '{sent} بھیجے، {failed} ناکام', roman_ur: '{sent} bheje, {failed} fail' },
+  bc_warn: { en: 'Tip: do not send too often — WhatsApp may flag spam. Keep offers genuine.', ur: 'مشورہ: بہت زیادہ نہ بھیجیں — واٹس ایپ اسپام سمجھ سکتا ہے۔', roman_ur: 'Tip: bohat zyada na bhejein — WhatsApp spam samajh sakta hai.' },
+  bc_no_customers: { en: 'No customers yet — broadcast needs at least one chat.', ur: 'ابھی کوئی گاہک نہیں — کم از کم ایک چیٹ چاہیے۔', roman_ur: 'Abhi koi customer nahi — kam az kam ek chat chahiye.' },
+  bc_connect_first: { en: 'Connect WhatsApp first', ur: 'پہلے واٹس ایپ کنیکٹ کریں', roman_ur: 'Pehle WhatsApp connect karein' },
 
   // ── WhatsApp Status ─────────────────────────────────────────────────────────
   wa_connected: { en: 'WhatsApp Connected', ur: 'واٹس ایپ کنیکٹڈ', roman_ur: 'WhatsApp Connected' },
