@@ -11,6 +11,7 @@ const DAY_KEYS = ['status_mon','status_tue','status_wed','status_thu','status_fr
 export default function StatusPage() {
   const { t } = useT();
   const [count, setCount] = useState(5);
+  const [caption, setCaption] = useState('');
   const [postTime, setPostTime] = useState('09:00');
   const [days, setDays] = useState([1, 2, 3, 4, 5, 6, 7]);
   const [sending, setSending] = useState(false);
@@ -30,6 +31,7 @@ export default function StatusPage() {
           setPostTime(r.data.post_time);
           setCount(r.data.count);
           setDays(r.data.days_of_week);
+          if (r.data.caption) setCaption(r.data.caption);
         }
       }).catch(() => {});
     }
@@ -41,7 +43,7 @@ export default function StatusPage() {
     if (!userId) return;
     setSending(true); setMsg('');
     try {
-      const r = await api.post('/api/wa/status-post', { count });
+      const r = await api.post('/api/wa/status-post', { count, caption });
       const results = r.data.results || [];
       const succeeded = results.filter((res: any) => res.success).length;
       const failed = results.filter((res: any) => !res.success).length;
@@ -54,7 +56,7 @@ export default function StatusPage() {
   async function saveSchedule() {
     if (!userId) return;
     setSending(true); setMsg('');
-    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days }); setScheduleActive(true); setMsg('Schedule saved!'); } catch { setMsg('Schedule failed'); }
+    try { await api.post('/api/schedule', { user_id: userId, post_time: postTime, count, days_of_week: days, caption }); setScheduleActive(true); setMsg('Schedule saved!'); } catch { setMsg('Schedule failed'); }
     setSending(false);
   }
 
@@ -90,6 +92,13 @@ export default function StatusPage() {
           <p className="text-xs mb-3" style={{ color: 'var(--text3)' }}>Har roz stock mein se itne products random select honge aur alag status story lage gi</p>
           <input type="number" min={1} max={50} value={count} onChange={e => setCount(Math.max(1, parseInt(e.target.value) || 1))}
             className="field text-lg font-bold text-center" style={{ maxWidth: 120 }} />
+
+          <div className="mt-4">
+            <label className="text-sm font-medium mb-1.5 block" style={{ color: 'var(--text)' }}>{t('status_caption')}</label>
+            <textarea value={caption} onChange={e => setCaption(e.target.value)} rows={2} maxLength={300}
+              placeholder={t('status_caption_ph')} className="field" style={{ resize: 'vertical', lineHeight: 1.5 }} />
+            <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>{t('status_caption_hint')} · {caption.length}/300</p>
+          </div>
         </div>
 
         <div className="rounded-2xl p-4" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
