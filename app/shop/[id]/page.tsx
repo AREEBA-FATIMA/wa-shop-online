@@ -27,8 +27,18 @@ export default function ShopPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // wa.me ko international format chahiye: 03710279194 -> 923710279194
+  function waNumber(raw: string): string {
+    let n = (raw || '').replace(/\D/g, '');
+    if (n.startsWith('00')) n = n.slice(2);                 // 0092... -> 92...
+    if (n.startsWith('92')) return n;                       // already intl
+    if (n.startsWith('0')) return '92' + n.slice(1);        // 03xx -> 923xx
+    if (n.length === 10 && n.startsWith('3')) return '92' + n; // 3xx... -> 923xx
+    return n;
+  }
+
   function order(item: Item) {
-    const phone = (shop?.phone || '').replace(/\D/g, '');
+    const phone = waNumber(shop?.phone || '');
     const price = item.on_sale ? item.sale_price : (item.discount_price || item.price);
     const text = encodeURIComponent(`${t('shop_order_msg')}${item.name} (Rs.${price})`);
     window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
