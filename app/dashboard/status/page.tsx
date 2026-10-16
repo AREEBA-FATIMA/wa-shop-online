@@ -8,6 +8,15 @@ import Link from 'next/link';
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_KEYS = ['status_mon','status_tue','status_wed','status_thu','status_fri','status_sat','status_sun'];
 
+// Caption template tags — click to insert, backend har product ke liye bhar deta hai
+const TAGS = [
+  { k: 'name', d: 'tag_name' },
+  { k: 'price', d: 'tag_price' },
+  { k: 'old_price', d: 'tag_old_price' },
+  { k: 'description', d: 'tag_description' },
+  { k: 'stock', d: 'tag_stock' },
+];
+
 export default function StatusPage() {
   const { t } = useT();
   const [count, setCount] = useState(5);
@@ -95,9 +104,23 @@ export default function StatusPage() {
 
           <div className="mt-4">
             <label className="text-sm font-medium mb-1.5 block" style={{ color: 'var(--text)' }}>{t('status_caption')}</label>
-            <textarea value={caption} onChange={e => setCaption(e.target.value)} rows={2} maxLength={300}
+            <textarea value={caption} onChange={e => setCaption(e.target.value)} rows={4} maxLength={600}
               placeholder={t('status_caption_ph')} className="field" style={{ resize: 'vertical', lineHeight: 1.5 }} />
-            <p className="text-xs mt-1" style={{ color: 'var(--text3)' }}>{t('status_caption_hint')} · {caption.length}/300</p>
+            <p className="text-xs mt-1 mb-2" style={{ color: 'var(--text3)' }}>{t('status_caption_hint')} · {caption.length}/600</p>
+
+            {/* Tag chips — click to insert; software har product ke liye khud bhar dega */}
+            <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text2)' }}>{t('status_tags_label')}</p>
+            <div className="flex gap-1.5 flex-wrap">
+              {TAGS.map(tag => (
+                <button key={tag.k} type="button" onClick={() => setCaption(c => (c + (c && !c.endsWith(' ') && !c.endsWith('\n') ? ' ' : '') + '{' + tag.k + '}'))}
+                  title={t(tag.d)}
+                  className="px-2.5 py-1 rounded-lg text-xs font-mono transition-all"
+                  style={{ background: 'var(--green-dim)', color: 'var(--green)', border: '0.5px solid rgba(37,211,102,0.3)' }}>
+                  {'{' + tag.k + '}'}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs mt-2 leading-relaxed" style={{ color: 'var(--text3)' }}>{t('status_tags_hint')}</p>
           </div>
         </div>
 
