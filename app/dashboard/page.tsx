@@ -8,12 +8,14 @@ import { useT } from '@/contexts/LangContext';
 export default function DashboardHome() {
   const { t } = useT();
   const [stats, setStats] = useState<any>(null);
+  const [alerts, setAlerts] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
 
   useEffect(() => {
     try { setUserName(JSON.parse(localStorage.getItem('wa_user') || '{}').name || ''); } catch {}
     api.get('/api/analytics').then(r => setStats(r.data)).catch(() => setStats(null)).finally(() => setLoading(false));
+    api.get('/api/alerts').then(r => setAlerts(r.data)).catch(() => {});
   }, []);
 
   const cards = stats ? [
@@ -61,8 +63,27 @@ export default function DashboardHome() {
         </div>
       )}
 
+      {/* Out of stock reminder */}
+      {alerts?.out_of_stock?.length > 0 && (
+        <Link href="/dashboard/products" className="rounded-2xl p-4 flex items-start gap-3 block" style={{ background: 'rgba(220,50,50,0.08)', border: '0.5px solid rgba(220,50,50,0.2)' }}>
+          <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(220,50,50,0.15)' }}>
+            <AlertTriangle size={16} style={{ color: '#e05a5a' }} />
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold mb-2" style={{ color: '#e05a5a' }}>{t('dash_out_of_stock')}</p>
+            <div className="flex flex-wrap gap-1.5">
+              {alerts.out_of_stock.map((p: any, i: number) => (
+                <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ background: 'rgba(220,50,50,0.12)', color: '#e05a5a', border: '0.5px solid rgba(220,50,50,0.2)' }}>
+                  {p.name}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Link>
+      )}
+
       {/* Low stock */}
-      {stats?.low_stock?.length > 0 && (
+      {(alerts?.low_stock?.length > 0 || stats?.low_stock?.length > 0) && (
         <div className="rounded-2xl p-4 flex items-start gap-3" style={{ background: 'rgba(234,160,30,0.08)', border: '0.5px solid rgba(234,160,30,0.2)' }}>
           <span className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(234,160,30,0.15)' }}>
             <AlertTriangle size={16} style={{ color: '#e8a030' }} />
@@ -70,9 +91,9 @@ export default function DashboardHome() {
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold mb-2" style={{ color: '#e8a030' }}>{t('dash_low_stock')}</p>
             <div className="flex flex-wrap gap-1.5">
-              {stats.low_stock.map((p: any, i: number) => (
+              {(alerts?.low_stock?.length ? alerts.low_stock : (stats?.low_stock || [])).map((p: any, i: number) => (
                 <span key={i} className="text-[11px] font-medium px-2.5 py-1 rounded-full" style={{ background: 'rgba(234,160,30,0.12)', color: '#e8a030', border: '0.5px solid rgba(234,160,30,0.2)' }}>
-                  {p.name} — {p.stock} left{p.ordered ? ` (${p.ordered} ordered)` : ''}
+                  {p.name} — {p.stock} left
                 </span>
               ))}
             </div>

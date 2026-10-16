@@ -7,13 +7,16 @@ import { useT } from '@/contexts/LangContext';
 interface Product {
   id: string; name: string; description: string; price: number;
   discount_price: number | null; floor_price: number; stock: number;
-  available_stock?: number; ordered_count?: number;
+  low_stock_threshold?: number;
+  available_stock?: number; pending_count?: number;
+  out_of_stock?: boolean; low_stock?: boolean;
+  sale_price?: number; on_sale?: boolean;
   category: string | null; variants?: string; include_in_status: boolean; image_url?: string;
 }
 
 const EMPTY: Omit<Product, 'id'> = {
   name: '', description: '', price: 0, discount_price: null,
-  floor_price: 0, stock: 0, category: '', variants: '', include_in_status: true, image_url: ''
+  floor_price: 0, stock: 0, low_stock_threshold: 3, category: '', variants: '', include_in_status: true, image_url: ''
 };
 
 export default function ProductsPage() {
@@ -33,7 +36,7 @@ export default function ProductsPage() {
 
   function openAdd() { setForm(EMPTY); setEditing(null); setSheetOpen(true); setErr(''); setImgPreview(''); }
   function openEdit(p: Product) {
-    setForm({ name: p.name, description: p.description, price: p.price, discount_price: p.discount_price, floor_price: p.floor_price, stock: p.stock, category: p.category || '', variants: p.variants || '', include_in_status: p.include_in_status, image_url: p.image_url || '' });
+    setForm({ name: p.name, description: p.description, price: p.price, discount_price: p.discount_price, floor_price: p.floor_price, stock: p.stock, low_stock_threshold: p.low_stock_threshold ?? 3, category: p.category || '', variants: p.variants || '', include_in_status: p.include_in_status, image_url: p.image_url || '' });
     setEditing(p); setSheetOpen(true); setErr(''); setImgPreview(p.image_url || '');
   }
 
@@ -157,11 +160,22 @@ export default function ProductsPage() {
                 ) : (
                   <div className="flex items-center justify-center h-full"><ImageIcon size={28} style={{ color: 'var(--text3)' }} /></div>
                 )}
-                {/* Badge */}
-                <span className={`absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full`}
-                  style={p.include_in_status ? { background: 'rgba(37,211,102,0.9)', color: '#fff' } : { background: 'rgba(0,0,0,0.4)', color: '#fff' }}>
-                  {p.include_in_status ? t('prod_active') : t('prod_hidden')}
-                </span>
+                {/* Badge: Out of stock overrides active/hidden */}
+                {p.out_of_stock ? (
+                  <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(220,50,50,0.95)', color: '#fff' }}>
+                    {t('prod_out_of_stock')}
+                  </span>
+                ) : (
+                  <span className="absolute top-2 right-2 text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                    style={p.include_in_status ? { background: 'rgba(37,211,102,0.9)', color: '#fff' } : { background: 'rgba(0,0,0,0.4)', color: '#fff' }}>
+                    {p.include_in_status ? t('prod_active') : t('prod_hidden')}
+                  </span>
+                )}
+                {/* Sale ribbon */}
+                {p.on_sale && !p.out_of_stock && (
+                  <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(234,88,12,0.95)', color: '#fff' }}>🔥 {t('prod_on_sale')}</span>
+                )}
+                {p.out_of_stock && <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.35)' }} />}
                 {/* Edit button overlay */}
                 <button onClick={() => openEdit(p)} className="absolute top-2 left-2 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110"
                   style={{ background: 'rgba(0,0,0,0.4)', color: '#fff' }}><Edit2 size={12} /></button>
@@ -172,17 +186,20 @@ export default function ProductsPage() {
                 {p.description && <p className="text-xs mt-1 line-clamp-2" style={{ color: 'var(--text3)' }}>{p.description}</p>}
                 <div className="flex items-center justify-between mt-3">
                   <div>
-                    <p className="font-bold" style={{ color: 'var(--green)' }}>Rs.{p.discount_price || p.price}</p>
-                    {p.discount_price && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
+                    <p className="font-bold" style={{ color: p.on_sale ? '#ea580c' : 'var(--green)' }}>Rs.{p.on_sale ? p.sale_price : (p.discount_price || p.price)}</p>
+                    {(p.on_sale || p.discount_price) && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-medium" style={{ color: (p.available_stock ?? p.stock) <= 3 ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} {t('prod_left')}{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
-                    {p.floor_price && <p className="text-[10px]" style={{ color: 'var(--text3)' }}>{t('prod_floor_label')}: Rs.{p.floor_price}</p>}
+                    <p className="text-xs font-medium" style={{ color: p.out_of_stock ? '#e05a5a' : p.low_stock ? '#e05a5a' : 'var(--text2)' }}>{(p.available_stock ?? p.stock)} {t('prod_left')}{(p.pending_count ?? 0) > 0 ? ` (${p.pending_count} pending)` : ''}</p>
+                    {p.floor_price ? <p className="text-[10px]" style={{ color: 'var(--text3)' }}>{t('prod_floor_label')}: Rs.{p.floor_price}</p> : null}
                   </div>
                 </div>
-                {(p.category || p.variants || (p.available_stock ?? p.stock) <= 3) && (
+                {(p.category || p.variants || p.low_stock || p.out_of_stock) && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {(p.available_stock ?? p.stock) <= 3 && (
+                    {p.out_of_stock && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(220,50,50,0.15)', color: '#e05a5a' }}>{t('prod_out_of_stock')}</span>
+                    )}
+                    {p.low_stock && !p.out_of_stock && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(220,50,50,0.1)', color: '#e05a5a' }}>{t('prod_low_stock')}</span>
                     )}
                     {p.category && <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'var(--bg3)', color: 'var(--text3)' }}>{p.category}</span>}
@@ -203,7 +220,7 @@ export default function ProductsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold truncate" style={{ color: 'var(--text)' }}>{p.name}</p>
-                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.discount_price || p.price} · {(p.available_stock ?? p.stock)} {t('prod_left')}{(p.ordered_count ?? 0) > 0 ? ` (${p.ordered_count} ordered)` : ''}</p>
+                <p className="text-xs" style={{ color: 'var(--text3)' }}>Rs.{p.on_sale ? p.sale_price : (p.discount_price || p.price)} · {(p.available_stock ?? p.stock)} {t('prod_left')}{p.out_of_stock ? ` · ${t('prod_out_of_stock')}` : ''}</p>
               </div>
               <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full`}
                 style={p.include_in_status ? { background: 'var(--green-dim)', color: 'var(--green)' } : { background: 'var(--bg3)', color: 'var(--text3)' }}>
@@ -263,6 +280,7 @@ export default function ProductsPage() {
                 { label: 'prod_sale_price', key: 'discount_price', type: 'number', icon: null },
                 { label: 'prod_floor_price', key: 'floor_price', type: 'number', icon: null, tip: 'prod_floor_tip' },
                 { label: 'prod_stock', key: 'stock', type: 'number', icon: Hash },
+                { label: 'prod_low_threshold', key: 'low_stock_threshold', type: 'number', icon: null, tip: 'prod_low_threshold_tip' },
                 { label: 'prod_category', key: 'category', type: 'text', icon: null },
                 { label: 'prod_variants', key: 'variants', type: 'text', icon: null, tip: 'prod_variants_ph' },
               ].map(f => (

@@ -7,13 +7,14 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 const API = process.env.NEXT_PUBLIC_API_URL || '';
 
-interface Item { id: string; name: string; description: string; price: number; discount_price: number | null; image_url?: string; category?: string; variants?: string; }
+interface Item { id: string; name: string; description: string; price: number; discount_price: number | null; sale_price?: number; on_sale?: boolean; in_stock?: boolean; image_url?: string; category?: string; variants?: string; }
+interface Camp { name: string; percent: number; }
 
 export default function ShopPage() {
   const { t } = useT();
   const params = useParams();
   const id = (params?.id as string) || '';
-  const [shop, setShop] = useState<{ shop_name: string; phone: string; products: Item[] } | null>(null);
+  const [shop, setShop] = useState<{ shop_name: string; phone: string; campaign?: Camp | null; products: Item[] } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
@@ -28,7 +29,7 @@ export default function ShopPage() {
 
   function order(item: Item) {
     const phone = (shop?.phone || '').replace(/\D/g, '');
-    const price = item.discount_price || item.price;
+    const price = item.on_sale ? item.sale_price : (item.discount_price || item.price);
     const text = encodeURIComponent(`${t('shop_order_msg')}${item.name} (Rs.${price})`);
     window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
   }
@@ -60,6 +61,13 @@ export default function ShopPage() {
         </div>
       </header>
 
+      {/* Campaign sale banner */}
+      {shop.campaign && shop.campaign.percent ? (
+        <div className="text-center py-2.5 px-4 text-sm font-bold" style={{ background: 'linear-gradient(90deg,#ea580c,#f97316)', color: '#fff' }}>
+          🔥 {shop.campaign.name} — {shop.campaign.percent}% OFF
+        </div>
+      ) : null}
+
       <main className="max-w-3xl mx-auto px-4 py-5">
         {shop.products.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -69,14 +77,20 @@ export default function ShopPage() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {shop.products.map(p => {
-              const onSale = p.discount_price && p.discount_price < p.price;
+              const outOfStock = p.in_stock === false;
+              const showPrice = p.on_sale ? p.sale_price : (p.discount_price || p.price);
+              const strike = p.on_sale || (p.discount_price && p.discount_price < p.price);
               return (
-                <div key={p.id} className="rounded-2xl overflow-hidden flex flex-col" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)' }}>
-                  <div className="aspect-square flex items-center justify-center" style={{ background: 'var(--bg3)' }}>
+                <div key={p.id} className="rounded-2xl overflow-hidden flex flex-col" style={{ background: 'var(--bg2)', border: '0.5px solid var(--border)', opacity: outOfStock ? 0.7 : 1 }}>
+                  <div className="relative aspect-square flex items-center justify-center" style={{ background: 'var(--bg3)' }}>
                     {p.image_url ? (
-                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" style={outOfStock ? { filter: 'grayscale(0.6)' } : {}} />
                     ) : (
                       <Package size={32} style={{ color: 'var(--text3)' }} />
+                    )}
+                    {p.on_sale && !outOfStock && <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(234,88,12,0.95)', color: '#fff' }}>🔥 SALE</span>}
+                    {outOfStock && (
+                      <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(220,50,50,0.95)', color: '#fff' }}>{t('prod_out_of_stock')}</span>
                     )}
                   </div>
                   <div className="p-3 flex flex-col flex-1">
@@ -84,11 +98,11 @@ export default function ShopPage() {
                     {p.description && <p className="text-[11px] mt-0.5 line-clamp-2" style={{ color: 'var(--text3)' }}>{p.description}</p>}
                     {p.variants && <p className="text-[10px] mt-1" style={{ color: 'var(--teal)' }}>{p.variants}</p>}
                     <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="font-bold" style={{ color: 'var(--green)' }}>Rs.{p.discount_price || p.price}</span>
-                      {onSale && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
+                      <span className="font-bold" style={{ color: p.on_sale ? '#ea580c' : 'var(--green)' }}>Rs.{showPrice}</span>
+                      {strike && <span className="text-[10px] line-through" style={{ color: 'var(--text3)' }}>Rs.{p.price}</span>}
                     </div>
-                    <button onClick={() => order(p)} className="btn-primary justify-center mt-2.5 text-xs w-full" style={{ padding: '8px 12px' }}>
-                      <MessageCircle size={13} /> {t('shop_order')}
+                    <button onClick={() => order(p)} disabled={outOfStock} className="btn-primary justify-center mt-2.5 text-xs w-full" style={{ padding: '8px 12px', opacity: outOfStock ? 0.5 : 1 }}>
+                      <MessageCircle size={13} /> {outOfStock ? t('shop_sold_out') : t('shop_order')}
                     </button>
                   </div>
                 </div>
